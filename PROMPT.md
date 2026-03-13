@@ -90,9 +90,21 @@ src/main/kotlin/com/subia/
 │   ├── CatalogController.kt       # GET /api/catalog?categoryId=X → JSON
 │   ├── CategoryController.kt      # CRUD /categories (web)
 │   ├── DashboardController.kt     # GET /dashboard (web)
-│   └── SubscriptionController.kt  # CRUD /subscriptions (web)
+│   ├── SubscriptionController.kt  # CRUD /subscriptions (web)
+│   └── api/
+│       ├── ApiSubscriptionController.kt  # REST /api/subscriptions
+│       ├── ApiCategoryController.kt      # REST /api/categories
+│       └── ApiDashboardController.kt     # REST /api/dashboard
 ├── dto/
-│   └── DashboardDto.kt
+│   ├── DashboardDto.kt
+│   └── api/
+│       ├── ApiResponse.kt         # Wrapper genérico { data, error }
+│       ├── ApiError.kt
+│       ├── SubscriptionRequestDto.kt + SubscriptionResponseDto.kt
+│       ├── CategoryRequestDto.kt + CategoryResponseDto.kt
+│       └── DashboardStatsDto.kt
+├── exception/
+│   └── ApiExceptionHandler.kt     # @RestControllerAdvice: 404, 409, 400, 500
 ├── model/
 │   ├── CatalogItem.kt             # data class, no entidad JPA
 │   ├── Category.kt                # Entidad JPA → tabla categories
@@ -164,6 +176,10 @@ CREATE TABLE subscriptions (
 | Catálogo 80+ servicios en EUR        | ✅     | CatalogService.kt estático |
 | Navbar activo                        | ✅     | currentPath via WebConfig interceptor |
 | API REST JSON /api/catalog           | ✅     | Base para la app móvil |
+| API REST /api/subscriptions (CRUD)   | ✅     | v1.2.0 — controlador + DTOs + wrapper ApiResponse |
+| API REST /api/categories (CRUD)      | ✅     | v1.2.0 — controlador + DTOs |
+| API REST /api/dashboard (stats)      | ✅     | v1.2.0 — gasto mensual/anual, activas, alertas |
+| ApiExceptionHandler                  | ✅     | v1.2.0 — 404, 409, 400, 500 en castellano |
 
 ---
 
@@ -176,11 +192,11 @@ PostgreSQL 16 activo via Docker en puerto 5433. Driver y flyway-database-postgre
 
 ---
 
-### P1 — API REST completa para la app móvil
+### ~~P1 — API REST completa para la app móvil~~ ✅ COMPLETADO (v1.2.0, 2026-03-13)
 
-Actualmente solo existe `/api/catalog`. Hay que exponer todos los recursos como JSON.
+API REST completa implementada. Controladores bajo `controller/api/`, DTOs bajo `dto/api/`.
 
-**Endpoints a implementar**:
+**Endpoints implementados**:
 
 ```
 # Suscripciones
@@ -198,18 +214,12 @@ PUT    /api/categories/{id}            → editar
 DELETE /api/categories/{id}            → borrar
 
 # Dashboard
-GET    /api/dashboard                  → stats (gasto mensual, anual, próximas renovaciones)
+GET    /api/dashboard                  → stats (gasto mensual, anual, activas, alertas renovación)
 
-# Catálogo (ya existe)
+# Catálogo (ya existía)
 GET    /api/catalog                    → todos los servicios
 GET    /api/catalog?categoryId=X       → filtrado por categoría
 ```
-
-**Estructura recomendada**: crear controladores separados bajo `controller/api/` para no mezclar
-con los controladores Thymeleaf. Usar `@RestController` + `@RequestMapping("/api/...")`.
-
-**DTOs para la API**: crear `dto/api/SubscriptionDto.kt`, `CategoryDto.kt`, `DashboardStatsDto.kt`.
-No exponer directamente las entidades JPA en los endpoints REST (evitar acoplamiento y campos sensibles).
 
 **Formato de respuesta estándar**:
 ```json
@@ -225,6 +235,23 @@ O en error:
   "error": { "code": "NOT_FOUND", "message": "Suscripción no encontrada" }
 }
 ```
+
+**Adaptaciones reales vs diseño original**:
+- `DashboardService.getDashboard()` (no `getDashboardData()`)
+- `activeCount` se obtiene de `subscriptionService.findActive().size`
+- `alertCount` se obtiene de `dash.alertRenewals.size`
+- PUT usa `save()` con el id seteado en la entidad (no existe método `update()` separado)
+
+**Archivos creados**:
+- `controller/api/ApiSubscriptionController.kt`
+- `controller/api/ApiCategoryController.kt`
+- `controller/api/ApiDashboardController.kt`
+- `dto/api/ApiResponse.kt` — wrapper genérico `ApiResponse<T>`
+- `dto/api/ApiError.kt`
+- `dto/api/SubscriptionRequestDto.kt` + `SubscriptionResponseDto.kt`
+- `dto/api/CategoryRequestDto.kt` + `CategoryResponseDto.kt`
+- `dto/api/DashboardStatsDto.kt`
+- `exception/ApiExceptionHandler.kt` — `@RestControllerAdvice` para 404, 409, 400, 500
 
 ---
 
@@ -591,7 +618,7 @@ YEARLY = precio anual total (no mensual × 12).
 
 **El asistente IA es responsable de mantener estos tres archivos actualizados en cada sesión.**
 
-### Versión actual: `1.1.0`
+### Versión actual: `1.2.0`
 
 Esquema: `MAJOR.MINOR.PATCH`
 
@@ -634,6 +661,6 @@ Esquema: `MAJOR.MINOR.PATCH`
 |---------|------------|--------------------------------------|------------|
 | 1.0.0   | 2026-03-13 | Primera versión funcional web        | Publicada  |
 | 1.1.0   | 2026-03-13 | Migración a PostgreSQL               | Publicada  |
-| 1.2.0   | —          | API REST completa para móvil         | Pendiente  |
+| 1.2.0   | 2026-03-13 | API REST completa (P1)               | Publicada  |
 | 1.3.0   | —          | Rediseño de interfaz                 | Pendiente  |
 | 2.0.0   | —          | JWT + app móvil KMM                  | Pendiente  |

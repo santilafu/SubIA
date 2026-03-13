@@ -7,6 +7,37 @@ Todas las versiones siguen [Semantic Versioning](https://semver.org/lang/es/):
 
 ---
 
+## [1.2.0] — 2026-03-13
+
+API REST completa (P1) para consumo desde la app móvil.
+
+### Añadido
+- API REST completa (P1): endpoints `/api/subscriptions` (CRUD), `/api/categories` (CRUD), `/api/dashboard`
+- `ApiResponse<T>` wrapper genérico con `ApiError` estructurado `{ data, error }`
+- `ApiExceptionHandler` (`@RestControllerAdvice`): gestión de 404, 409, 400 y 500 con mensajes en castellano
+- DTOs separados para request/response bajo `dto/api/`: `SubscriptionRequestDto`, `SubscriptionResponseDto`, `CategoryRequestDto`, `CategoryResponseDto`, `DashboardStatsDto`
+- Controladores REST bajo `controller/api/`: `ApiSubscriptionController`, `ApiCategoryController`, `ApiDashboardController`
+
+### Notas técnicas
+- `DashboardService.getDashboard()` (no `getDashboardData()`)
+- `activeCount` calculado con `subscriptionService.findActive().size`
+- `alertCount` calculado con `dash.alertRenewals.size`
+- PUT usa `save()` con id seteado en la entidad (no método `update()` separado)
+
+---
+
+## [1.1.0] — 2026-03-13
+
+Migración de base de datos a PostgreSQL para persistencia real.
+
+### Cambiado
+- Migración H2 → PostgreSQL 16 (Docker, puerto 5433)
+- Añadido driver PostgreSQL y `flyway-database-postgresql` para soporte PG16
+- `docker-compose.yml` en la raíz para arrancar PostgreSQL con un solo comando
+- Chivato de conexión a BD en startup (`ApplicationRunner` en `SubIaApplication.kt`)
+
+---
+
 ## [1.0.0] — 2026-03-13
 
 Primera versión funcional completa de la aplicación web.
@@ -31,24 +62,6 @@ Primera versión funcional completa de la aplicación web.
 
 ### Stack
 - Kotlin 2.1.20 · Spring Boot 3.3.5 · Java 21 · H2 (en memoria) · Flyway · Thymeleaf 3.1 · Bootstrap 5.3
-
----
-
-## [1.1.0] — pendiente
-
-### Planificado
-- Migración de H2 a PostgreSQL 16 con persistencia real
-- `docker-compose.yml` para arrancar PostgreSQL con un solo comando
-
----
-
-## [1.2.0] — pendiente
-
-### Planificado
-- API REST completa: `/api/subscriptions`, `/api/categories`, `/api/dashboard`
-- DTOs separados de las entidades JPA
-- Respuestas de error estructuradas `{data, error}`
-- Validación de entrada con Bean Validation en todos los endpoints
 
 ---
 

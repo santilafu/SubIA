@@ -1,6 +1,6 @@
 # SubIA — Gestor de suscripciones
 
-![Version](https://img.shields.io/badge/versión-1.1.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/versión-1.2.0-6366f1?style=flat-square)
 ![Stack](https://img.shields.io/badge/Spring%20Boot-3.3.5-6db33f?style=flat-square&logo=springboot)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-7f52ff?style=flat-square&logo=kotlin)
 ![Java](https://img.shields.io/badge/Java-21-007396?style=flat-square&logo=openjdk)
@@ -21,6 +21,28 @@
 | 🗂️ **Categorías predefinidas** | 10 categorías listas desde el primer arranque: IA, Streaming, Música, Software, Cloud, Gaming, Seguridad, Noticias, Salud y Desarrollo |
 | 🔒 **Seguridad** | CSRF en todos los formularios POST, cabeceras de seguridad (X-Frame-Options, X-Content-Type-Options) |
 | 💶 **Todo en euros** | Precios del catálogo en EUR, pensado para el mercado europeo |
+
+---
+
+## 🔌 API REST
+
+Disponible desde v1.2.0. Todos los endpoints devuelven `{ "data": ..., "error": null }` o `{ "data": null, "error": { "code": "...", "message": "..." } }`.
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/subscriptions` | Lista todas las suscripciones |
+| GET | `/api/subscriptions/{id}` | Detalle de una suscripción |
+| POST | `/api/subscriptions` | Crear suscripción (body JSON) |
+| PUT | `/api/subscriptions/{id}` | Editar suscripción (body JSON) |
+| DELETE | `/api/subscriptions/{id}` | Eliminar suscripción |
+| GET | `/api/categories` | Lista todas las categorías |
+| GET | `/api/categories/{id}` | Detalle de una categoría |
+| POST | `/api/categories` | Crear categoría (body JSON) |
+| PUT | `/api/categories/{id}` | Editar categoría (body JSON) |
+| DELETE | `/api/categories/{id}` | Eliminar categoría |
+| GET | `/api/dashboard` | Stats: gasto mensual/anual, activas, alertas de renovación |
+| GET | `/api/catalog` | Todos los servicios del catálogo |
+| GET | `/api/catalog?categoryId=X` | Servicios filtrados por categoría |
 
 ---
 
@@ -67,11 +89,23 @@ src/main/kotlin/com/subia/
 │   └── SecurityConfig.kt            # CSRF, headers de seguridad
 ├── controller/
 │   ├── CatalogController.kt         # GET /api/catalog — servicios conocidos (JSON)
-│   ├── CategoryController.kt        # CRUD /categories
-│   ├── DashboardController.kt       # GET /dashboard
-│   └── SubscriptionController.kt    # CRUD /subscriptions
+│   ├── CategoryController.kt        # CRUD /categories (web)
+│   ├── DashboardController.kt       # GET /dashboard (web)
+│   ├── SubscriptionController.kt    # CRUD /subscriptions (web)
+│   └── api/
+│       ├── ApiSubscriptionController.kt  # REST /api/subscriptions (CRUD JSON)
+│       ├── ApiCategoryController.kt      # REST /api/categories (CRUD JSON)
+│       └── ApiDashboardController.kt     # REST /api/dashboard (stats JSON)
 ├── dto/
-│   └── DashboardDto.kt              # Datos calculados del dashboard
+│   ├── DashboardDto.kt              # Datos calculados del dashboard (web)
+│   └── api/
+│       ├── ApiResponse.kt           # Wrapper genérico { data, error }
+│       ├── ApiError.kt              # Estructura de error { code, message }
+│       ├── SubscriptionRequestDto.kt
+│       ├── SubscriptionResponseDto.kt
+│       ├── CategoryRequestDto.kt
+│       ├── CategoryResponseDto.kt
+│       └── DashboardStatsDto.kt
 ├── model/
 │   ├── CatalogItem.kt               # Servicio del catálogo (no entidad JPA)
 │   ├── Category.kt                  # Entidad — tabla categories
@@ -148,6 +182,6 @@ Consulta [CHANGELOG.md](CHANGELOG.md) para el historial completo de cambios.
 |---------|------------|--------------------------------------|
 | 1.0.0   | 2026-03-13 | Primera versión funcional completa   |
 | 1.1.0   | 2026-03-13 | Migración a PostgreSQL               |
-| 1.2.0   | pendiente  | API REST para app móvil              |
+| 1.2.0   | 2026-03-13 | API REST completa (P1)               |
 | 1.3.0   | pendiente  | Rediseño de interfaz                 |
 | 2.0.0   | pendiente  | Autenticación JWT + app móvil KMM    |
