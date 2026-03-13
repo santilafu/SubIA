@@ -1,0 +1,19 @@
+services:
+  postgres:
+    # Usamos la imagen oficial de PostgreSQL versión 16
+    image: postgres:16
+    environment:
+      # Configuramos la base de datos inicial y las credenciales
+      POSTGRES_DB: subia
+      POSTGRES_USER: subia_user
+      POSTGRES_PASSWORD: subia_pass
+    ports:
+      # Mapeamos el puerto interno del contenedor al de tu máquina local
+      - "5433:5432"
+    volumes:
+      # Asignamos un volumen para que los datos no se borren al apagar Docker
+      - subia_data:/var/lib/postgresql/data
+
+volumes:
+  # Declaramos el volumen que hemos referenciado arriba
+  subia_data:

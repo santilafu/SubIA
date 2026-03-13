@@ -1,6 +1,6 @@
 # SubIA — Gestor de suscripciones
 
-![Version](https://img.shields.io/badge/versión-1.0.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/versión-1.1.0-6366f1?style=flat-square)
 ![Stack](https://img.shields.io/badge/Spring%20Boot-3.3.5-6db33f?style=flat-square&logo=springboot)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-7f52ff?style=flat-square&logo=kotlin)
 ![Java](https://img.shields.io/badge/Java-21-007396?style=flat-square&logo=openjdk)
@@ -32,7 +32,7 @@
 | Framework | Spring Boot 3.3 |
 | Seguridad | Spring Security (CSRF + headers) |
 | Persistencia | Spring Data JPA + Hibernate |
-| Base de datos | H2 (en memoria) |
+| Base de datos | PostgreSQL 16 (Docker) |
 | Migraciones | Flyway |
 | Frontend | Thymeleaf + Bootstrap 5 + Chart.js 4 |
 | Tipografía | Inter (Google Fonts) |
@@ -42,20 +42,19 @@
 
 ## 🚀 Cómo ejecutar
 
-**Requisito**: JDK 21 o superior.
+**Requisitos previos**: JDK 21 o superior y Docker.
 
 ```bash
-# Con la variable JAVA_HOME apuntando a tu JDK:
+# 1. Arrancar PostgreSQL con Docker
+docker-compose up -d
+
+# 2. Arrancar la aplicación
 JAVA_HOME=/ruta/a/tu/jdk ./gradlew bootRun
 ```
 
 La aplicación arranca en **http://localhost:8081**.
 
-> **Nota**: la base de datos es H2 en memoria. Los datos no persisten entre reinicios.
-> Para persistencia, cambia en `application.properties`:
-> ```properties
-> spring.datasource.url=jdbc:h2:file:./subia-data
-> ```
+Los datos persisten en un volumen Docker (`subia_data`) entre reinicios.
 
 ---
 
@@ -148,7 +147,7 @@ Consulta [CHANGELOG.md](CHANGELOG.md) para el historial completo de cambios.
 | Versión | Fecha      | Descripción                          |
 |---------|------------|--------------------------------------|
 | 1.0.0   | 2026-03-13 | Primera versión funcional completa   |
-| 1.1.0   | pendiente  | Migración a PostgreSQL               |
+| 1.1.0   | 2026-03-13 | Migración a PostgreSQL               |
 | 1.2.0   | pendiente  | API REST para app móvil              |
 | 1.3.0   | pendiente  | Rediseño de interfaz                 |
 | 2.0.0   | pendiente  | Autenticación JWT + app móvil KMM    |
