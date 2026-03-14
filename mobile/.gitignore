@@ -6,3 +6,4 @@ shared/build/
 iosApp/build/
 *.xcworkspace/
 .DS_Store
+*.hprof
