@@ -1,26 +1,29 @@
 # Suscript Wallet — Gestor de suscripciones
 
-![Version](https://img.shields.io/badge/versión-2.0.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/versión-2.1.0-6366f1?style=flat-square)
+![Android](https://img.shields.io/badge/Android-8.0%2B-3ddc84?style=flat-square&logo=android)
 ![Stack](https://img.shields.io/badge/Spring%20Boot-3.3.5-6db33f?style=flat-square&logo=springboot)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-7f52ff?style=flat-square&logo=kotlin)
 ![Java](https://img.shields.io/badge/Java-21-007396?style=flat-square&logo=openjdk)
 ![License](https://img.shields.io/badge/uso-personal-lightgrey?style=flat-square)
 
-> Controla todos tus servicios de pago en un solo lugar. Visualiza el gasto mensual y anual, filtra por categoría, recibe alertas de renovación y añade nuevas suscripciones con precios actuales gracias al catálogo integrado.
+> Controla todos tus servicios de pago en un solo lugar. Disponible como **app Android nativa** y **aplicación web**. Visualiza el gasto mensual y anual, filtra por categoría, recibe alertas de renovación y añade nuevas suscripciones con precios actuales gracias al catálogo integrado.
 
 ---
 
 ## ✨ Características
 
-| Función | Descripción |
-|---------|-------------|
-| 📊 **Dashboard** | Gasto mensual/anual, gráfico de dona por categoría, alertas de renovación a 7 y 30 días |
-| 🔍 **Búsqueda en tiempo real** | Filtra suscripciones por nombre mientras escribes, sin recargar la página |
-| 🏷️ **Filtro por categoría** | Pills interactivos para ver solo las suscripciones de una categoría |
-| 📋 **Catálogo integrado** | Más de 80 servicios conocidos con precios actuales (marzo 2026). Rellena el formulario automáticamente |
-| 🗂️ **Categorías predefinidas** | 10 categorías listas desde el primer arranque: IA, Streaming, Música, Software, Cloud, Gaming, Seguridad, Noticias, Salud y Desarrollo |
-| 🔒 **Seguridad** | CSRF en todos los formularios POST, cabeceras de seguridad (X-Frame-Options, X-Content-Type-Options) |
-| 💶 **Todo en euros** | Precios del catálogo en EUR, pensado para el mercado europeo |
+| Función | Web | Android |
+|---------|:---:|:-------:|
+| 📊 **Dashboard** — gasto mensual/anual, alertas de renovación | ✅ | ✅ |
+| 🔍 **Búsqueda en tiempo real** de suscripciones | ✅ | ✅ |
+| 🏷️ **Filtro por categoría** | ✅ | ✅ |
+| 📋 **Catálogo integrado** — 80+ servicios, prerellena el formulario | ✅ | ✅ |
+| 🖼️ **Logos de servicios** (Spotify, Netflix, ChatGPT…) | — | ✅ |
+| 📡 **Modo offline** — caché en memoria, banner de aviso | — | ✅ |
+| 🔒 **Tokens seguros** — EncryptedSharedPreferences (Android Keystore) | — | ✅ |
+| 🗂️ **Categorías predefinidas** — 10 listas desde el primer arranque | ✅ | ✅ |
+| 💶 **Todo en euros** — precios en EUR, mercado europeo | ✅ | ✅ |
 
 ---
 
@@ -233,13 +236,14 @@ mobile/
 │       ├── androidMain/             # actual implementations (EncryptedSharedPreferences, CIO)
 │       └── iosMain/                 # actual implementations (Keychain Services, Darwin)
 └── androidApp/                      # Módulo Android
-    └── src/main/kotlin/com/subia/android/
+    └── src/androidMain/kotlin/com/subia/android/
         ├── SubIAApp.kt              # Application — Koin startKoin
         ├── MainActivity.kt          # Single Activity + auth check
         ├── navigation/AppNavGraph.kt # Type-safe routes (@Serializable)
         └── ui/
             ├── SubIAApp.kt          # Root composable + NavigationBar
-            ├── theme/               # SubIA palette, dark MaterialTheme
+            ├── ServiceLogo.kt        # Logos de servicios conocidos (Compose)
+            ├── theme/               # Suscript Wallet palette, dark MaterialTheme
             └── screens/             # Login, Dashboard, Suscripciones, Detalle, Form, Categorías, Catálogo
 ```
 
@@ -293,3 +297,4 @@ Consulta [CHANGELOG.md](CHANGELOG.md) para el historial completo de cambios.
 | 1.3.0   | 2026-03-14 | Autenticación JWT (P2)               |
 | 1.4.0   | 2026-03-14 | UI redesign — Tailwind dark mode     |
 | 2.0.0   | 2026-03-14 | App móvil KMM (Android) + Compose Multiplatform |
+| 2.1.0   | 2026-03-14 | App funcional con datos reales, logos, rename Suscript Wallet |

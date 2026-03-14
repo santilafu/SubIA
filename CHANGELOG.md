@@ -1,4 +1,4 @@
-# Changelog — SubIA
+# Changelog — Suscript Wallet
 
 Todas las versiones siguen [Semantic Versioning](https://semver.org/lang/es/):
 - **MAJOR** — cambio incompatible o rediseño completo
@@ -127,3 +127,22 @@ App móvil nativa Android (P4) con Kotlin Multiplatform Mobile, preparada para i
 - iOS `iosApp` (Compose Multiplatform iOS target)
 - Notificaciones push de renovación
 - Widget de pantalla de inicio
+
+---
+
+## [2.1.0] — 2026-03-14
+
+App Android operativa con datos reales. Rename del proyecto a **Suscript Wallet**.
+
+### Añadido
+- **Logos de servicios** en pantallas de Suscripciones, Detalle y Catálogo — íconos vectoriales de Spotify, Netflix, ChatGPT, YouTube y más (`ServiceLogo.kt` + `LogoUtils.kt`)
+- **`gradle.properties`** en `mobile/` — `android.useAndroidX=true`, `enableJetifier`, `kotlin.native.ignoreDisabledTargets=true` (iOS targets ignorados en Windows)
+
+### Corregido
+- **Login mobile funcional** — campo `username` (no `email`), `cleartext traffic` habilitado en el emulador, respuesta del backend envuelta en `ApiResponse` correctamente
+- **Respuesta vacía en todos los endpoints** — añadidos `@SerialName` en todos los modelos KMM para mapear camelCase del backend; wrappers `ApiResponse` en `CatalogController` y `ApiDashboardController`
+- **Errores de compilación KMM** — fuentes movidas de `src/main/` a `src/androidMain/` (convención KMM), imports corregidos, dependencias alineadas
+- **`SuscripcionFormViewModel`** — prefilling desde catálogo y edición operativos con los nuevos `@SerialName`
+
+### Cambiado
+- Proyecto renombrado de **SubIA** a **Suscript Wallet** (launcher Android, `settings.gradle.kts`, README, CHANGELOG, repo GitHub)
