@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.subia.shared.viewmodel.AuthUiState
 import com.subia.shared.viewmodel.AuthViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla de inicio de sesión con email y contraseña. */
 @Composable

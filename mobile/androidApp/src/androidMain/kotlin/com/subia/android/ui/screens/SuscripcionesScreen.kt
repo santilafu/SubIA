@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.subia.shared.model.Subscription
 import com.subia.shared.viewmodel.SuscripcionesUiState
 import com.subia.shared.viewmodel.SuscripcionesViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla con la lista de suscripciones del usuario. */
 @OptIn(ExperimentalMaterial3Api::class)

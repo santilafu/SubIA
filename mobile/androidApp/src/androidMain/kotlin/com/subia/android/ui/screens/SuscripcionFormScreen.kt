@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.subia.shared.viewmodel.FormUiState
 import com.subia.shared.viewmodel.SuscripcionFormViewModel
 import com.subia.shared.viewmodel.CategoriasViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla de formulario para crear o editar una suscripción. */
 @OptIn(ExperimentalMaterial3Api::class)

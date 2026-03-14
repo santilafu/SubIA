@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.subia.shared.model.CatalogItem
 import com.subia.shared.viewmodel.CatalogoUiState
 import com.subia.shared.viewmodel.CatalogoViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla del catálogo de servicios con búsqueda client-side y selección para prerellenar formulario. */
 @Composable

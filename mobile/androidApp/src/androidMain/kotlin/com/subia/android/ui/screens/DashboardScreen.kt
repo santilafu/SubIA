@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.subia.shared.model.DashboardSummary
 import com.subia.shared.viewmodel.DashboardUiState
 import com.subia.shared.viewmodel.DashboardViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
 
 /** Pantalla principal con totales de gasto y renovaciones próximas. */
