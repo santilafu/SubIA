@@ -35,9 +35,10 @@ import kotlinx.serialization.json.Json
  */
 class ApiClient(
     private val baseUrl: String,
-    private val tokenStorage: TokenStorage
+    @PublishedApi internal val tokenStorage: TokenStorage
 ) {
-    private val refreshMutex = Mutex()
+    @PublishedApi
+    internal val refreshMutex = Mutex()
 
     private val jsonConfig = Json {
         ignoreUnknownKeys = true
@@ -45,11 +46,12 @@ class ApiClient(
         coerceInputValues = true
     }
 
-    val client = HttpClient(createHttpEngine()) {
+    @PublishedApi
+    internal val client = HttpClient(createHttpEngine()) {
         install(ContentNegotiation) { json(jsonConfig) }
         install(Logging) {
             level = LogLevel.INFO
-            logger = Logger.DEFAULT
+            logger = object : Logger { override fun log(message: String) = println(message) }
         }
         defaultRequest {
             url(baseUrl)
@@ -135,7 +137,8 @@ class ApiClient(
         return parseResponse(response)
     }
 
-    private suspend fun tryRefresh(refreshToken: String): Boolean {
+    @PublishedApi
+    internal suspend fun tryRefresh(refreshToken: String): Boolean {
         return try {
             val tokens: AuthTokens = client.post(ApiRoutes.REFRESH) {
                 contentType(ContentType.Application.Json)

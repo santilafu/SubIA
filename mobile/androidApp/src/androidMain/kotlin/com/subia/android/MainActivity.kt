@@ -13,7 +13,7 @@ import com.subia.android.navigation.DashboardRoute
 import com.subia.android.ui.SubIAApp
 import com.subia.android.ui.theme.SubIATheme
 import com.subia.shared.viewmodel.AuthViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /** Punto de entrada de la app. Única Activity, todo lo demás es Compose. */
 class MainActivity : ComponentActivity() {

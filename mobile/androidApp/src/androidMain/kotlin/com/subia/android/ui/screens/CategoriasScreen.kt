@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.subia.shared.viewmodel.CategoriasUiState
 import com.subia.shared.viewmodel.CategoriasViewModel
 import com.subia.shared.viewmodel.CrearCategoriaUiState
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla de categorías con lista y botón para crear nuevas. */
 @Composable
