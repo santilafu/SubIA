@@ -54,6 +54,6 @@ class ApiDashboardController(
      * Devuelve gastoMensual, gastoAnual, totalSuscripciones y renovacionesProximas.
      */
     @GetMapping("/stats")
-    fun getMobileStats(): ResponseEntity<DashboardMobileStatsDto> =
-        ResponseEntity.ok(dashboardService.getDashboardStats())
+    fun getMobileStats(): ResponseEntity<ApiResponse<DashboardMobileStatsDto>> =
+        ResponseEntity.ok(ApiResponse(data = dashboardService.getDashboardStats()))
 }

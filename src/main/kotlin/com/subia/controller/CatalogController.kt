@@ -1,8 +1,10 @@
 package com.subia.controller
 
+import com.subia.dto.api.ApiResponse
 import com.subia.model.CatalogItem
 import com.subia.service.CatalogService
 import com.subia.service.CategoryService
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -35,14 +37,16 @@ class CatalogController(
      * @return Lista de [CatalogItem] serializada como JSON por Jackson.
      */
     @GetMapping
-    fun getItems(@RequestParam(required = false) categoryId: Long?): List<CatalogItem> {
-        // Si no se pasa categoryId, devuelve todo el catálogo
-        if (categoryId == null) return catalogService.getAllItems()
-
-        // Busca la categoría y filtra el catálogo por su nombre
-        val category = runCatching { categoryService.findById(categoryId) }.getOrNull()
-            ?: return catalogService.getAllItems()
-
-        return catalogService.getItemsForCategory(category.name)
+    fun getItems(@RequestParam(required = false) categoryId: Long?): ResponseEntity<ApiResponse<List<CatalogItem>>> {
+        val items = if (categoryId == null) {
+            // Si no se pasa categoryId, devuelve todo el catálogo
+            catalogService.getAllItems()
+        } else {
+            // Busca la categoría y filtra el catálogo por su nombre
+            val category = runCatching { categoryService.findById(categoryId) }.getOrNull()
+            if (category == null) catalogService.getAllItems()
+            else catalogService.getItemsForCategory(category.name)
+        }
+        return ResponseEntity.ok(ApiResponse(data = items))
     }
 }
