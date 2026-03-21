@@ -1,5 +1,6 @@
 package com.subia.android.ui.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +52,7 @@ fun CatalogoScreen(
 
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(16.dp))
-        Text("Catálogo", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text("Catálogo", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
         Text("${itemsFiltrados.size} servicios", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(12.dp))
 
@@ -108,12 +109,17 @@ private fun CatalogoGrid(items: List<CatalogItem>, onSeleccionar: (CatalogItem) 
 @Composable
 private fun CatalogoItemCard(item: CatalogItem, onSeleccionar: (CatalogItem) -> Unit) {
     Card(
-        modifier = Modifier.clickable { onSeleccionar(item) },
+        modifier = Modifier
+            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
+            .clickable { onSeleccionar(item) },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(10.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {

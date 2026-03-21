@@ -1,6 +1,7 @@
 package com.subia.android.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -135,7 +136,7 @@ private fun ListaSuscripciones(
     ) {
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text("Suscripciones", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Text("Suscripciones", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
                 Text("${suscripciones.size} activas", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -190,11 +191,15 @@ private fun ListaSuscripciones(
 @Composable
 private fun SuscripcionCard(sub: Subscription, onNavigateToDetalle: (Long) -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.fillMaxWidth().clickable { onNavigateToDetalle(sub.id) },
+        modifier = modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
+            .clickable { onNavigateToDetalle(sub.id) },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             ServiceLogo(nombre = sub.nombre, size = 44.dp)
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.subia.shared.model.CatalogItem
 import com.subia.shared.viewmodel.FormUiState
+import kotlinx.serialization.json.Json
 import com.subia.shared.viewmodel.SuscripcionFormViewModel
 import com.subia.shared.viewmodel.CategoriasViewModel
 import kotlinx.datetime.Instant
@@ -80,12 +81,14 @@ fun SuscripcionFormScreen(
 
     // Prerrellenado desde el catálogo via SavedStateHandle (T08)
     LaunchedEffect(Unit) {
-        val item = navController?.previousBackStackEntry
+        val itemJson = navController?.previousBackStackEntry
             ?.savedStateHandle
-            ?.get<CatalogItem>("catalog_item")
-        item?.let {
-            formViewModel.prerellenarDesdeCatalogo(it)
-            navController.previousBackStackEntry?.savedStateHandle?.remove<CatalogItem>("catalog_item")
+            ?.get<String>("catalog_item_json")
+        itemJson?.let { json ->
+            runCatching { Json.decodeFromString<CatalogItem>(json) }.getOrNull()?.let { item ->
+                formViewModel.prerellenarDesdeCatalogo(item)
+            }
+            navController.previousBackStackEntry?.savedStateHandle?.remove<String>("catalog_item_json")
         }
     }
 

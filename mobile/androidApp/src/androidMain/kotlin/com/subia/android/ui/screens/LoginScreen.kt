@@ -8,10 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -55,14 +60,23 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 28.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Logo / icono superior
+        Icon(
+            imageVector = Icons.Default.AccountBalanceWallet,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(56.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "SubIA",
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 40.sp,
+            fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
@@ -70,7 +84,7 @@ fun LoginScreen(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
         OutlinedTextField(
             value = email,
@@ -78,6 +92,7 @@ fun LoginScreen(
             label = { Text("Usuario") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(14.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -87,7 +102,7 @@ fun LoginScreen(
             ),
             enabled = !isLoading
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         OutlinedTextField(
             value = password,
@@ -95,6 +110,7 @@ fun LoginScreen(
             label = { Text("Contraseña") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(14.dp),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -108,7 +124,7 @@ fun LoginScreen(
             ),
             enabled = !isLoading
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         if (uiState is AuthUiState.Error) {
             Text(
@@ -117,18 +133,29 @@ fun LoginScreen(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
         Button(
             onClick = { viewModel.login(email, password) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
             enabled = !isLoading
         ) {
             if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(22.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             } else {
-                Text("Iniciar sesión")
+                Text("Iniciar sesión", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             }
         }
     }

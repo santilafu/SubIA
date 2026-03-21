@@ -1,6 +1,7 @@
 package com.subia.android.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.subia.android.ui.ServiceLogo
 import com.subia.android.ui.components.GastosPorCategoriaCard
+import com.subia.android.ui.theme.GradientAmberEnd
+import com.subia.android.ui.theme.GradientAmberStart
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
+import com.subia.android.ui.theme.GradientTealEnd
+import com.subia.android.ui.theme.GradientTealStart
+import com.subia.android.ui.theme.Warning
 import com.subia.shared.model.DashboardSummary
 import com.subia.shared.model.ProximaRenovacion
 import com.subia.shared.viewmodel.DashboardUiState
@@ -89,13 +97,23 @@ private fun DashboardContent(
     totalesPorMoneda: Map<String, Double> = emptyMap(),
     gastosPorCategoria: Map<String, Double> = emptyMap()
 ) {
+    val gradients = listOf(
+        Brush.linearGradient(listOf(GradientIndigoStart, GradientIndigoEnd)),
+        Brush.linearGradient(listOf(GradientTealStart, GradientTealEnd)),
+        Brush.linearGradient(listOf(GradientAmberStart, GradientAmberEnd))
+    )
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Text("Dashboard", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(
+                "Dashboard",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold
+            )
             Text(
                 "Resumen de tus suscripciones",
                 style = MaterialTheme.typography.bodyMedium,
@@ -105,30 +123,23 @@ private fun DashboardContent(
 
         item {
             if (totalesPorMoneda.isEmpty()) {
-                // Fallback: mostrar el total único en EUR del servidor
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     GradientStatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.EuroSymbol,
                         label = "Mensual",
                         value = "%.2f €".format(resumen.gastoMensual),
-                        gradient = Brush.linearGradient(listOf(Color(0xFF6366F1), Color(0xFF8B5CF6)))
+                        gradient = gradients[0]
                     )
                     GradientStatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.CalendarToday,
                         label = "Anual",
                         value = "%.0f €".format(resumen.gastoAnual),
-                        gradient = Brush.linearGradient(listOf(Color(0xFF14B8A6), Color(0xFF06B6D4)))
+                        gradient = gradients[1]
                     )
                 }
             } else {
-                // Mostrar una tarjeta por divisa detectada
-                val gradients = listOf(
-                    Brush.linearGradient(listOf(Color(0xFF6366F1), Color(0xFF8B5CF6))),
-                    Brush.linearGradient(listOf(Color(0xFF14B8A6), Color(0xFF06B6D4))),
-                    Brush.linearGradient(listOf(Color(0xFFF59E0B), Color(0xFFEF4444)))
-                )
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     totalesPorMoneda.entries.toList().chunked(2).forEachIndexed { rowIdx, rowEntries ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -142,7 +153,6 @@ private fun DashboardContent(
                                     gradient = gradients[gradientIdx]
                                 )
                             }
-                            // Si hay un número impar, añadir un espacio vacío con peso 1
                             if (rowEntries.size == 1) {
                                 Spacer(Modifier.weight(1f))
                             }
@@ -154,27 +164,51 @@ private fun DashboardContent(
 
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                shape = RoundedCornerShape(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Subscriptions, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(24.dp))
+                    Icon(
+                        Icons.Default.Subscriptions,
+                        null,
+                        tint = Warning,
+                        modifier = Modifier.size(24.dp)
+                    )
                     Spacer(Modifier.width(12.dp))
-                    Text("Suscripciones activas", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                    Text("${resumen.totalSuscripciones}", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFFF59E0B))
+                    Text(
+                        "Suscripciones activas",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        "${resumen.totalSuscripciones}",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        color = Warning
+                    )
                 }
             }
         }
 
         if (resumen.renovacionesProximas.isNotEmpty()) {
             item {
-                Text("Próximas renovaciones", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Próximas renovaciones",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
             items(resumen.renovacionesProximas) { RenovacionCard(it) }
         } else {
             item {
-                Text("No tienes renovaciones próximas", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    "No tienes renovaciones próximas",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
 
@@ -186,38 +220,59 @@ private fun DashboardContent(
 
 @Composable
 private fun GradientStatCard(modifier: Modifier, icon: ImageVector, label: String, value: String, gradient: Brush) {
-    Box(modifier.clip(RoundedCornerShape(16.dp)).background(gradient).padding(16.dp)) {
+    Box(
+        modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(gradient)
+            .padding(16.dp)
+    ) {
         Column {
-            Icon(icon, null, tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(20.dp))
+            Icon(icon, null, tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(20.dp))
             Spacer(Modifier.height(8.dp))
             Text(label, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-            Text(value, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Text(value, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
         }
     }
 }
 
 @Composable
 private fun RenovacionCard(renovacion: ProximaRenovacion) {
+    val diasColor = when {
+        renovacion.diasRestantes <= 3 -> MaterialTheme.colorScheme.error
+        renovacion.diasRestantes <= 7 -> Warning
+        else -> Color(0xFF22C55E)
+    }
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             ServiceLogo(nombre = renovacion.nombre, size = 40.dp)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(renovacion.nombre, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                Text(renovacion.fechaRenovacion, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    renovacion.fechaRenovacion,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("%.2f €".format(renovacion.precio), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                val diasColor = when {
-                    renovacion.diasRestantes <= 3 -> Color(0xFFEF4444)
-                    renovacion.diasRestantes <= 7 -> Color(0xFFF59E0B)
-                    else -> Color(0xFF10B981)
-                }
-                Text("${renovacion.diasRestantes}d", style = MaterialTheme.typography.bodySmall, color = diasColor, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "%.2f €".format(renovacion.precio),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    "${renovacion.diasRestantes}d",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = diasColor,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }
@@ -225,7 +280,13 @@ private fun RenovacionCard(renovacion: ProximaRenovacion) {
 
 @Composable
 fun BannerOffline(mensaje: String) {
-    Box(Modifier.fillMaxWidth().background(Color(0xFFF59E0B)).padding(8.dp), Alignment.Center) {
-        Text(mensaje, color = Color.White, style = MaterialTheme.typography.bodySmall)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(Warning)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        Alignment.Center
+    ) {
+        Text(mensaje, color = Color.White, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
     }
 }
