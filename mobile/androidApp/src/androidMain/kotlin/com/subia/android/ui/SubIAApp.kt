@@ -93,7 +93,7 @@ fun SubIAApp(
                 TopAppBar(
                     title = {
                         Text(
-                            "SubIA",
+                            "SuscriptWallet",
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
