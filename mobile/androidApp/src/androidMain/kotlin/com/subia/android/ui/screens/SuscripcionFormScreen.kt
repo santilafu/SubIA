@@ -1,5 +1,6 @@
 package com.subia.android.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -24,9 +28,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -73,6 +80,12 @@ fun SuscripcionFormScreen(
     val fechaRenovacion by formViewModel.fechaRenovacion.collectAsState()
     val notas by formViewModel.notas.collectAsState()
 
+    // Estado del selector de catálogo en línea
+    val categorias by formViewModel.categorias.collectAsState()
+    val serviciosPorCategoria by formViewModel.serviciosPorCategoria.collectAsState()
+    val cargandoServicios by formViewModel.cargandoServicios.collectAsState()
+    val categoriaSeleccionadaId by formViewModel.categoriaSeleccionadaId.collectAsState()
+
     val isLoading = uiState is FormUiState.Loading
 
     LaunchedEffect(uiState) {
@@ -101,6 +114,12 @@ fun SuscripcionFormScreen(
     val monedasOpciones = listOf("EUR", "USD", "GBP")
     val periodosOpciones = listOf("MONTHLY" to "Mensual", "YEARLY" to "Anual", "WEEKLY" to "Semanal")
 
+    // Estado del selector de catálogo en línea
+    var selectorExpandido by remember { mutableStateOf(false) }
+    var expandedCategoriaSel by remember { mutableStateOf(false) }
+    var expandedServicioSel by remember { mutableStateOf(false) }
+    var servicioSeleccionado by remember { mutableStateOf<CatalogItem?>(null) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -121,6 +140,149 @@ fun SuscripcionFormScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
+            // ── Selector de catálogo en línea ──────────────────────────────
+            OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                // Cabecera plegable
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { selectorExpandido = !selectorExpandido }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Elegir del catálogo",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Icon(
+                        imageVector = if (selectorExpandido) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = if (selectorExpandido) "Contraer" else "Expandir",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                AnimatedVisibility(visible = selectorExpandido) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        // Dropdown de categoría
+                        ExposedDropdownMenuBox(
+                            expanded = expandedCategoriaSel,
+                            onExpandedChange = { expandedCategoriaSel = it }
+                        ) {
+                            OutlinedTextField(
+                                value = categorias.find { it.id == categoriaSeleccionadaId }?.nombre ?: "",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Categoría") },
+                                placeholder = { Text("Selecciona una categoría") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedCategoriaSel) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedCategoriaSel,
+                                onDismissRequest = { expandedCategoriaSel = false }
+                            ) {
+                                categorias.forEach { categoria ->
+                                    DropdownMenuItem(
+                                        text = { Text(categoria.nombre) },
+                                        onClick = {
+                                            formViewModel.seleccionarCategoriaDelSelector(categoria.id)
+                                            servicioSeleccionado = null
+                                            expandedCategoriaSel = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Dropdown de servicio (deshabilitado hasta que haya categoría)
+                        ExposedDropdownMenuBox(
+                            expanded = expandedServicioSel && categoriaSeleccionadaId != null && !cargandoServicios,
+                            onExpandedChange = { if (categoriaSeleccionadaId != null && !cargandoServicios) expandedServicioSel = it }
+                        ) {
+                            OutlinedTextField(
+                                value = when {
+                                    cargandoServicios -> "Cargando servicios…"
+                                    servicioSeleccionado != null -> servicioSeleccionado!!.nombre
+                                    else -> ""
+                                },
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Servicio") },
+                                placeholder = { Text(if (categoriaSeleccionadaId == null) "Primero elige una categoría" else "Selecciona un servicio") },
+                                trailingIcon = {
+                                    if (cargandoServicios) {
+                                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                                    } else {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(expandedServicioSel && categoriaSeleccionadaId != null)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                enabled = categoriaSeleccionadaId != null && !cargandoServicios
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedServicioSel && categoriaSeleccionadaId != null && !cargandoServicios,
+                                onDismissRequest = { expandedServicioSel = false }
+                            ) {
+                                serviciosPorCategoria.forEach { item ->
+                                    val etiquetaPrecio = if (item.precioMensual != null) {
+                                        val periodoCorto = when (item.periodoFacturacion.uppercase()) {
+                                            "YEARLY" -> "año"
+                                            "WEEKLY" -> "sem."
+                                            else -> "mes"
+                                        }
+                                        " — ${item.precioMensual} ${item.moneda}/$periodoCorto"
+                                    } else ""
+                                    DropdownMenuItem(
+                                        text = { Text("${item.nombre}$etiquetaPrecio") },
+                                        onClick = {
+                                            servicioSeleccionado = item
+                                            expandedServicioSel = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Botón "Aplicar selección" — solo visible cuando hay servicio elegido
+                        if (servicioSeleccionado != null) {
+                            FilledTonalButton(
+                                onClick = {
+                                    servicioSeleccionado?.let { formViewModel.seleccionarServicioDelCatalogo(it) }
+                                    selectorExpandido = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Aplicar selección")
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Campos del formulario (sin cambios) ────────────────────────
+
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { formViewModel.nombre.value = it },

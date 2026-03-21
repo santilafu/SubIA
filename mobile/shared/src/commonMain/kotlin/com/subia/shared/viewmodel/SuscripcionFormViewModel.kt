@@ -3,9 +3,12 @@ package com.subia.shared.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.subia.shared.model.CatalogItem
+import com.subia.shared.model.Category
 import com.subia.shared.model.NuevaSuscripcionRequest
 import com.subia.shared.model.Subscription
 import com.subia.shared.network.NetworkException
+import com.subia.shared.repository.CatalogRepository
+import com.subia.shared.repository.CategoryRepository
 import com.subia.shared.repository.SubscriptionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,9 +25,12 @@ sealed interface FormUiState {
 /**
  * ViewModel para crear y editar suscripciones.
  * Gestiona los campos del formulario y la validación antes de enviar al servidor.
+ * Incluye soporte para el selector de catálogo en línea (categoría → servicio).
  */
 class SuscripcionFormViewModel(
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionRepository: SubscriptionRepository,
+    private val catalogRepository: CatalogRepository,
+    private val categoryRepository: CategoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<FormUiState>(FormUiState.Idle)
@@ -36,8 +42,71 @@ class SuscripcionFormViewModel(
     val moneda = MutableStateFlow("EUR")
     val periodoFacturacion = MutableStateFlow("MONTHLY")
     val fechaRenovacion = MutableStateFlow("")
+    /** Id de la categoría asignada a la suscripción (campo real del formulario). */
     val categoriaId = MutableStateFlow<Long?>(null)
     val notas = MutableStateFlow("")
+
+    // ── Selector de catálogo en línea ──────────────────────────────────────
+
+    private val _categorias = MutableStateFlow<List<Category>>(emptyList())
+    /** Lista de categorías disponibles para el selector de catálogo. */
+    val categorias: StateFlow<List<Category>> = _categorias.asStateFlow()
+
+    private val _serviciosPorCategoria = MutableStateFlow<List<CatalogItem>>(emptyList())
+    /** Servicios del catálogo correspondientes a la categoría seleccionada en el selector. */
+    val serviciosPorCategoria: StateFlow<List<CatalogItem>> = _serviciosPorCategoria.asStateFlow()
+
+    /**
+     * Id de la categoría elegida en el selector de catálogo (UI únicamente).
+     * No confundir con [categoriaId], que es el campo real de la suscripción.
+     */
+    val categoriaSeleccionadaId = MutableStateFlow<Long?>(null)
+
+    private val _cargandoServicios = MutableStateFlow(false)
+    /** Indica si se están cargando los servicios del catálogo para la categoría elegida. */
+    val cargandoServicios: StateFlow<Boolean> = _cargandoServicios.asStateFlow()
+
+    init {
+        cargarCategorias()
+    }
+
+    /** Carga la lista de categorías al inicializar el ViewModel. */
+    private fun cargarCategorias() {
+        viewModelScope.launch {
+            categoryRepository.getAll()
+                .onSuccess { _categorias.value = it }
+        }
+    }
+
+    /**
+     * Selecciona una categoría en el selector de catálogo y carga sus servicios.
+     * Pasar `null` limpia la selección y la lista de servicios.
+     */
+    fun seleccionarCategoriaDelSelector(categoriaId: Long?) {
+        categoriaSeleccionadaId.value = categoriaId
+        _serviciosPorCategoria.value = emptyList()
+        if (categoriaId == null) return
+
+        viewModelScope.launch {
+            _cargandoServicios.value = true
+            catalogRepository.getByCategory(categoriaId)
+                .onSuccess { _serviciosPorCategoria.value = it }
+            _cargandoServicios.value = false
+        }
+    }
+
+    /**
+     * Aplica el servicio elegido en el selector de catálogo al formulario.
+     * Llama a [prerellenarDesdeCatalogo] y además asigna la [categoriaId] de la suscripción
+     * buscando la categoría que corresponde al ítem seleccionado.
+     */
+    fun seleccionarServicioDelCatalogo(item: CatalogItem) {
+        prerellenarDesdeCatalogo(item)
+        // Asignar la categoría real de la suscripción a partir de la selección del selector
+        categoriaSeleccionadaId.value?.let { categoriaId.value = it }
+    }
+
+    // ── Operaciones existentes ─────────────────────────────────────────────
 
     /** Precarga los campos a partir de una suscripción existente (modo edición). */
     fun cargarParaEditar(suscripcion: Subscription) {
