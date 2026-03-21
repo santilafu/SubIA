@@ -98,12 +98,29 @@ class SuscripcionFormViewModel(
     /**
      * Aplica el servicio elegido en el selector de catálogo al formulario.
      * Llama a [prerellenarDesdeCatalogo] y además asigna la [categoriaId] de la suscripción
-     * buscando la categoría que corresponde al ítem seleccionado.
+     * buscando la categoría cuyo nombre coincida con [CatalogItem.categoriaKey] (sin distinguir
+     * mayúsculas ni acentos). Si no hay coincidencia exacta se usa la primera categoría disponible.
+     * También actualiza [categoriaSeleccionadaId] para que el desplegable de la UI refleje la
+     * selección.
      */
     fun seleccionarServicioDelCatalogo(item: CatalogItem) {
         prerellenarDesdeCatalogo(item)
-        // Asignar la categoría real de la suscripción a partir de la selección del selector
-        categoriaSeleccionadaId.value?.let { categoriaId.value = it }
+
+        // Normaliza una cadena eliminando acentos y pasándola a minúsculas para comparar
+        fun String.normalizar(): String =
+            this.lowercase()
+                .replace('á', 'a').replace('é', 'e').replace('í', 'i')
+                .replace('ó', 'o').replace('ú', 'u').replace('ü', 'u').replace('ñ', 'n')
+
+        val claveBuscada = item.categoriaKey.normalizar()
+        val categoriaEncontrada = _categorias.value.firstOrNull { cat ->
+            cat.nombre.normalizar() == claveBuscada
+        } ?: _categorias.value.firstOrNull()
+
+        categoriaEncontrada?.let { cat ->
+            categoriaId.value = cat.id
+            categoriaSeleccionadaId.value = cat.id
+        }
     }
 
     // ── Operaciones existentes ─────────────────────────────────────────────

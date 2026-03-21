@@ -58,6 +58,13 @@ class DashboardViewModel(
      */
     val gastosPorCategoria: StateFlow<Map<String, Double>> = _gastosPorCategoria.asStateFlow()
 
+    private val _totalesAnualesPorMoneda = MutableStateFlow<Map<String, Double>>(emptyMap())
+    /**
+     * Mapa de divisa → gasto anual total (gasto mensual × 12).
+     * El orden de salida es: EUR primero, USD segundo, resto por orden alfabético.
+     */
+    val totalesAnualesPorMoneda: StateFlow<Map<String, Double>> = _totalesAnualesPorMoneda.asStateFlow()
+
     init { cargarEstadisticas() }
 
     /** Carga las estadísticas del dashboard y los totales por divisa en paralelo. */
@@ -77,6 +84,7 @@ class DashboardViewModel(
                 val cachedSubs = runCatching { json.decodeFromString<List<Subscription>>(cachedSubsJson) }.getOrNull()
                 if (cachedSubs != null) {
                     _totalesPorMoneda.value = calcularTotalesPorMoneda(cachedSubs)
+                    _totalesAnualesPorMoneda.value = calcularTotalesAnualesPorMoneda(cachedSubs)
                     _gastosPorCategoria.value = calcularGastosPorCategoria(cachedSubs)
                 }
             }
@@ -115,6 +123,7 @@ class DashboardViewModel(
 
             subsResult.onSuccess { subs ->
                 _totalesPorMoneda.value = calcularTotalesPorMoneda(subs)
+                _totalesAnualesPorMoneda.value = calcularTotalesAnualesPorMoneda(subs)
                 _gastosPorCategoria.value = calcularGastosPorCategoria(subs)
                 cacheRepository.saveString(CACHE_KEY_SUBS, json.encodeToString(subs))
                 cacheRepository.saveTimestamp(CACHE_KEY_SUBS)
@@ -135,6 +144,28 @@ class DashboardViewModel(
         for (sub in subs) {
             val mensual = if (sub.periodoFacturacion == "YEARLY") sub.precio / 12.0 else sub.precio
             result[sub.moneda] = (result[sub.moneda] ?: 0.0) + mensual
+        }
+        return result.entries
+            .sortedWith(compareBy { entry ->
+                when (entry.key) {
+                    "EUR" -> "0"
+                    "USD" -> "1"
+                    else -> "2${entry.key}"
+                }
+            })
+            .associate { it.key to it.value }
+    }
+
+    /**
+     * Agrupa las suscripciones por divisa sumando el gasto **anual** total (gasto mensual × 12).
+     * Las suscripciones anuales se usan directamente; las mensuales se multiplican por 12.
+     * El orden de salida es: EUR primero, USD segundo, resto por orden alfabético.
+     */
+    internal fun calcularTotalesAnualesPorMoneda(subs: List<Subscription>): Map<String, Double> {
+        val result = mutableMapOf<String, Double>()
+        for (sub in subs) {
+            val anual = if (sub.periodoFacturacion == "YEARLY") sub.precio else sub.precio * 12.0
+            result[sub.moneda] = (result[sub.moneda] ?: 0.0) + anual
         }
         return result.entries
             .sortedWith(compareBy { entry ->

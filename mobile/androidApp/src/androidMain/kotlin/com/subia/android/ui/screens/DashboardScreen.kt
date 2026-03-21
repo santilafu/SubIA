@@ -62,6 +62,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun DashboardScreen(viewModel: DashboardViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val totalesPorMoneda by viewModel.totalesPorMoneda.collectAsState()
+    val totalesAnualesPorMoneda by viewModel.totalesAnualesPorMoneda.collectAsState()
     val gastosPorCategoria by viewModel.gastosPorCategoria.collectAsState()
     val isRefreshing = uiState is DashboardUiState.Loading
 
@@ -74,10 +75,10 @@ fun DashboardScreen(viewModel: DashboardViewModel = koinViewModel()) {
             is DashboardUiState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                 CircularProgressIndicator()
             }
-            is DashboardUiState.Success -> DashboardContent(state.resumen, totalesPorMoneda, gastosPorCategoria)
+            is DashboardUiState.Success -> DashboardContent(state.resumen, totalesPorMoneda, totalesAnualesPorMoneda, gastosPorCategoria)
             is DashboardUiState.Offline -> Column {
                 BannerOffline("Mostrando datos guardados — sin conexión")
-                state.resumenCacheado?.let { DashboardContent(it, totalesPorMoneda, gastosPorCategoria) }
+                state.resumenCacheado?.let { DashboardContent(it, totalesPorMoneda, totalesAnualesPorMoneda, gastosPorCategoria) }
             }
             is DashboardUiState.Error -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -95,12 +96,18 @@ fun DashboardScreen(viewModel: DashboardViewModel = koinViewModel()) {
 private fun DashboardContent(
     resumen: DashboardSummary,
     totalesPorMoneda: Map<String, Double> = emptyMap(),
+    totalesAnualesPorMoneda: Map<String, Double> = emptyMap(),
     gastosPorCategoria: Map<String, Double> = emptyMap()
 ) {
-    val gradients = listOf(
+    val gradientsMensual = listOf(
         Brush.linearGradient(listOf(GradientIndigoStart, GradientIndigoEnd)),
+        Brush.linearGradient(listOf(GradientIndigoStart, GradientIndigoEnd)),
+        Brush.linearGradient(listOf(GradientIndigoStart, GradientIndigoEnd))
+    )
+    val gradientsAnual = listOf(
         Brush.linearGradient(listOf(GradientTealStart, GradientTealEnd)),
-        Brush.linearGradient(listOf(GradientAmberStart, GradientAmberEnd))
+        Brush.linearGradient(listOf(GradientTealStart, GradientTealEnd)),
+        Brush.linearGradient(listOf(GradientTealStart, GradientTealEnd))
     )
 
     LazyColumn(
@@ -123,38 +130,64 @@ private fun DashboardContent(
 
         item {
             if (totalesPorMoneda.isEmpty()) {
+                // Sin datos detallados: mostrar tarjetas del resumen del servidor
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     GradientStatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.EuroSymbol,
                         label = "Mensual",
                         value = "%.2f €".format(resumen.gastoMensual),
-                        gradient = gradients[0]
+                        gradient = gradientsMensual[0]
                     )
                     GradientStatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.CalendarToday,
                         label = "Anual",
                         value = "%.0f €".format(resumen.gastoAnual),
-                        gradient = gradients[1]
+                        gradient = gradientsAnual[0]
                     )
                 }
             } else {
+                // Con datos detallados: fila mensual + fila anual por divisa
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    totalesPorMoneda.entries.toList().chunked(2).forEachIndexed { rowIdx, rowEntries ->
+                    // Fila 1: totales mensuales
+                    val entradasMensuales = totalesPorMoneda.entries.toList()
+                    entradasMensuales.chunked(2).forEachIndexed { rowIdx, rowEntries ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             rowEntries.forEachIndexed { colIdx, (moneda, total) ->
-                                val gradientIdx = (rowIdx * 2 + colIdx) % gradients.size
+                                val gradientIdx = (rowIdx * 2 + colIdx) % gradientsMensual.size
                                 GradientStatCard(
                                     modifier = Modifier.weight(1f),
                                     icon = Icons.Default.EuroSymbol,
                                     label = "Mensual ($moneda)",
                                     value = "%.2f %s".format(total, moneda),
-                                    gradient = gradients[gradientIdx]
+                                    gradient = gradientsMensual[gradientIdx]
                                 )
                             }
                             if (rowEntries.size == 1) {
                                 Spacer(Modifier.weight(1f))
+                            }
+                        }
+                    }
+
+                    // Fila 2: totales anuales (gradiente teal para diferenciarlos)
+                    val entradasAnuales = totalesAnualesPorMoneda.entries.toList()
+                    if (entradasAnuales.isNotEmpty()) {
+                        entradasAnuales.chunked(2).forEachIndexed { rowIdx, rowEntries ->
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                rowEntries.forEachIndexed { colIdx, (moneda, total) ->
+                                    val gradientIdx = (rowIdx * 2 + colIdx) % gradientsAnual.size
+                                    GradientStatCard(
+                                        modifier = Modifier.weight(1f),
+                                        icon = Icons.Default.CalendarToday,
+                                        label = "Anual ($moneda)",
+                                        value = "%.0f %s".format(total, moneda),
+                                        gradient = gradientsAnual[gradientIdx]
+                                    )
+                                }
+                                if (rowEntries.size == 1) {
+                                    Spacer(Modifier.weight(1f))
+                                }
                             }
                         }
                     }

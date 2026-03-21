@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 
 /**
  * Worker periódico que revisa las próximas renovaciones de suscripciones y lanza
- * notificaciones locales para aquellas que se renuevan en 1, 2 o 3 días.
+ * una notificación local para aquellas que se renuevan exactamente en 3 días.
  *
  * Lee las suscripciones directamente desde SharedPreferences("subia_cache") para no
  * depender de inyección de dependencias en el contexto del Worker.
@@ -57,7 +57,7 @@ class RenovacionWorker(
                 val fechaRenovacion = runCatching { LocalDate.parse(sub.fechaRenovacion) }.getOrNull()
                     ?: return@filter false
                 val diasRestantes = hoy.daysUntil(fechaRenovacion)
-                diasRestantes in 1..3
+                diasRestantes == 3
             }
             .forEachIndexed { index, sub ->
                 lanzarNotificacion(sub, index)
