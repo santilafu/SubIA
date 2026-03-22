@@ -296,7 +296,7 @@ private fun SuscripcionCard(sub: Subscription, onNavigateToDetalle: (Long) -> Un
     val diasPrueba: Int? = if (sub.esPrueba && !sub.fechaFinPrueba.isNullOrBlank()) {
         runCatching {
             val hoy = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-            hoy.daysUntil(LocalDate.parse(sub.fechaFinPrueba))
+            hoy.daysUntil(LocalDate.parse(sub.fechaFinPrueba!!))
         }.getOrNull()
     } else null
 
