@@ -13,5 +13,6 @@ data class CatalogItem(
     @SerialName("billingCycle") val periodoFacturacion: String = "",
     @SerialName("description") val descripcion: String = "",
     @SerialName("categoryKey") val categoriaKey: String = "",
-    @SerialName("trialDays") val diasPrueba: Int? = null
+    @SerialName("trialDays") val diasPrueba: Int? = null,
+    @SerialName("cancelUrl") val cancelUrl: String? = null
 )

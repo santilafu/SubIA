@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -42,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,8 +62,10 @@ import com.subia.android.ui.theme.GradientIndigoEnd
 import com.subia.android.ui.theme.GradientIndigoStart
 import com.subia.android.ui.theme.Indigo400
 import com.subia.android.ui.theme.Indigo500
+import com.subia.shared.repository.CatalogRepository
 import com.subia.shared.viewmodel.SuscripcionesUiState
 import com.subia.shared.viewmodel.SuscripcionesViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla de detalle de una suscripción con opciones de editar y eliminar. */
@@ -76,6 +80,9 @@ fun SuscripcionDetalleScreen(
     val uiState by viewModel.uiState.collectAsState()
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val catalogRepository: CatalogRepository = koinInject()
+    val uriHandler = LocalUriHandler.current
+    var cancelUrl by remember { mutableStateOf<String?>(null) }
 
     val suscripcion = when (val state = uiState) {
         is SuscripcionesUiState.Success -> state.suscripciones.find { it.id == suscripcionId }
@@ -86,6 +93,16 @@ fun SuscripcionDetalleScreen(
     LaunchedEffect(uiState) {
         if (uiState is SuscripcionesUiState.Error) {
             snackbarHostState.showSnackbar((uiState as SuscripcionesUiState.Error).mensaje)
+        }
+    }
+
+    // Busca la URL de cancelación en el catálogo por nombre de servicio
+    LaunchedEffect(suscripcion?.nombre) {
+        val nombre = suscripcion?.nombre ?: return@LaunchedEffect
+        catalogRepository.getAll().onSuccess { items ->
+            cancelUrl = items.firstOrNull {
+                it.nombre.equals(nombre, ignoreCase = true)
+            }?.cancelUrl
         }
     }
 
@@ -199,6 +216,25 @@ fun SuscripcionDetalleScreen(
                             Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text("Editar suscripción", fontWeight = FontWeight.SemiBold)
+                        }
+                        // Botón cancelar suscripción — solo si existe URL oficial
+                        if (cancelUrl != null) {
+                            OutlinedButton(
+                                onClick = { uriHandler.openUri(cancelUrl!!) },
+                                modifier = Modifier.fillMaxWidth().height(52.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color(0xFFF97316)
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    Color(0xFFF97316).copy(alpha = 0.6f)
+                                )
+                            ) {
+                                Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Ir a cancelar suscripción", fontWeight = FontWeight.SemiBold)
+                            }
                         }
                         // Botón eliminar — outlined error
                         OutlinedButton(
