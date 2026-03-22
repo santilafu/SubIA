@@ -1,6 +1,8 @@
 package com.subia.android.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,18 +33,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
+import com.subia.android.ui.theme.Indigo400
 import com.subia.shared.viewmodel.AuthUiState
 import com.subia.shared.viewmodel.AuthViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla de inicio de sesión con email y contraseña. */
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
@@ -52,6 +67,15 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val isLoading = uiState is AuthUiState.Loading
+
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(GradientIndigoStart, GradientIndigoEnd, Color(0xFFA78BFA)),
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+    val buttonGradient = Brush.horizontalGradient(
+        colors = listOf(GradientIndigoStart, GradientIndigoEnd)
+    )
 
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) onLoginSuccess()
@@ -68,21 +92,33 @@ fun LoginScreen(
         Icon(
             imageVector = Icons.Default.AccountBalanceWallet,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(56.dp)
+            tint = Indigo400,
+            modifier = Modifier.size(64.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // Título con gradiente
         Text(
-            text = "SuscriptWallet",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.primary
+            text = buildAnnotatedString {
+                withStyle(
+                    SpanStyle(
+                        brush = gradientBrush,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 40.sp
+                    )
+                ) {
+                    append("SuscriptWallet")
+                }
+            },
+            textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Gestión de suscripciones",
+            text = "Controla tus suscripciones",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            letterSpacing = 1.sp,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -92,7 +128,11 @@ fun LoginScreen(
             label = { Text("Usuario") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Indigo400,
+                focusedLabelColor = Indigo400
+            ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -110,7 +150,11 @@ fun LoginScreen(
             label = { Text("Contraseña") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Indigo400,
+                focusedLabelColor = Indigo400
+            ),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -136,26 +180,43 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(10.dp))
         }
 
-        Button(
-            onClick = { viewModel.login(email, password) },
+        // Botón con gradiente indigo→violeta
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            enabled = !isLoading
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(22.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                .height(56.dp)
+                .background(
+                    brush = if (!isLoading) buttonGradient else Brush.horizontalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(28.dp)
                 )
-            } else {
-                Text("Iniciar sesión", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+        ) {
+            Button(
+                onClick = { viewModel.login(email, password) },
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(28.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.Transparent,
+                    disabledContentColor = Color.White.copy(alpha = 0.5f)
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+                enabled = !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White
+                    )
+                } else {
+                    Text("Iniciar sesión", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                }
             }
         }
     }

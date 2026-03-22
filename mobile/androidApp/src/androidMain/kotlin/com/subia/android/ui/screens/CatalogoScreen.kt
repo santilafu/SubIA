@@ -20,27 +20,40 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.subia.android.ui.ServiceLogo
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
+import com.subia.android.ui.theme.Indigo400
 import com.subia.shared.model.CatalogItem
 import com.subia.shared.viewmodel.CatalogoUiState
 import com.subia.shared.viewmodel.CatalogoViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalTextApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogoScreen(
     onSeleccionarItem: (CatalogItem) -> Unit,
@@ -50,20 +63,56 @@ fun CatalogoScreen(
     val itemsFiltrados by viewModel.itemsFiltrados.collectAsState()
     val busqueda by viewModel.busqueda.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-        Spacer(Modifier.height(16.dp))
-        Text("Catálogo", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
-        Text("${itemsFiltrados.size} servicios", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(12.dp))
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(GradientIndigoStart, GradientIndigoEnd, Color(0xFFA78BFA)),
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
 
-        OutlinedTextField(
+    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+        Spacer(Modifier.height(20.dp))
+
+        // Cabecera con gradiente
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    SpanStyle(
+                        brush = gradientBrush,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 34.sp
+                    )
+                ) {
+                    append("Catálogo")
+                }
+            }
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = "80+ servicios disponibles",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            letterSpacing = 0.8.sp
+        )
+        Spacer(Modifier.height(16.dp))
+
+        // Campo de búsqueda — estilo filled con esquinas redondeadas
+        TextField(
             value = busqueda,
             onValueChange = { viewModel.busqueda.value = it },
             placeholder = { Text("Buscar servicio...") },
-            leadingIcon = { Icon(Icons.Default.Search, null) },
+            leadingIcon = { Icon(Icons.Default.Search, null, tint = Indigo400) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(20.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                focusedLeadingIconColor = Indigo400,
+                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
         Spacer(Modifier.height(12.dp))
 
@@ -135,8 +184,9 @@ private fun CatalogoItemCard(item: CatalogItem, onSeleccionar: (CatalogItem) -> 
             item.precioMensual?.let {
                 Text(
                     "%.2f €/m".format(it),
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Indigo400,
                     textAlign = TextAlign.Center
                 )
             }

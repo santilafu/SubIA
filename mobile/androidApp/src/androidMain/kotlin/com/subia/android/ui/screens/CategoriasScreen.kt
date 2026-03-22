@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,15 +41,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
+import com.subia.android.ui.theme.Indigo500
 import com.subia.shared.model.Category
 import com.subia.shared.viewmodel.CategoriasUiState
 import com.subia.shared.viewmodel.CategoriasViewModel
 import com.subia.shared.viewmodel.CrearCategoriaUiState
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun CategoriasScreen(viewModel: CategoriasViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,7 +81,7 @@ fun CategoriasScreen(viewModel: CategoriasViewModel = koinViewModel()) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { if (!crearDeshabilitado) mostrarFormulario = true },
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = Indigo500,
                 elevation = FloatingActionButtonDefaults.elevation(4.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Nueva categoría", tint = Color.White)
@@ -131,17 +143,42 @@ fun CategoriasScreen(viewModel: CategoriasViewModel = koinViewModel()) {
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun CategoriasList(categorias: List<Category>, modifier: Modifier) {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(GradientIndigoStart, GradientIndigoEnd, Color(0xFFA78BFA)),
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         item {
-            Text("Categorías", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text("${categorias.size} categorías", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(
+                        SpanStyle(
+                            brush = gradientBrush,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 34.sp
+                        )
+                    ) {
+                        append("Categorías")
+                    }
+                }
+            )
             Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Organiza tus gastos",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                letterSpacing = 0.8.sp
+            )
+            Spacer(Modifier.height(8.dp))
         }
         items(categorias, key = { it.id }) { cat ->
             CategoriaCard(cat)
@@ -158,22 +195,40 @@ private fun CategoriaCard(cat: Category) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            // Barra de acento izquierda con el color de la categoría
             Box(
-                Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(color.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .width(5.dp)
+                    .height(70.dp)
+                    .background(
+                        color = color,
+                        shape = RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp)
+                    )
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Circle, null, tint = color, modifier = Modifier.size(18.dp))
-            }
-            Column(Modifier.padding(start = 14.dp).weight(1f)) {
-                Text(cat.nombre, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge)
-                if (cat.icon.isNotEmpty()) {
-                    Text(cat.icon, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Box(
+                    Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(color.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Circle, null, tint = color, modifier = Modifier.size(18.dp))
+                }
+                Column(Modifier.padding(start = 14.dp).weight(1f)) {
+                    Text(cat.nombre, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge)
+                    if (cat.icon.isNotEmpty()) {
+                        Text(cat.icon, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
         }

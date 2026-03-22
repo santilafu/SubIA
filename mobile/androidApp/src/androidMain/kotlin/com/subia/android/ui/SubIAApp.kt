@@ -1,6 +1,16 @@
 package com.subia.android.ui
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Home
@@ -61,7 +71,7 @@ private val bottomNavItems = listOf(
 )
 
 /** Composable raíz: gestiona NavHost, barra superior con logout y barra de navegación inferior. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun SubIAApp(
     navController: NavHostController,
@@ -85,6 +95,12 @@ fun SubIAApp(
         bottomNavItems.any { (route, _, _) -> dest.hasRoute(route::class) }
     } ?: false
 
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(GradientIndigoStart, GradientIndigoEnd, Color(0xFFA78BFA)),
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+
     var showMenu by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -93,9 +109,17 @@ fun SubIAApp(
                 TopAppBar(
                     title = {
                         Text(
-                            "SuscriptWallet",
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    SpanStyle(
+                                        brush = gradientBrush,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 20.sp
+                                    )
+                                ) {
+                                    append("SuscriptWallet")
+                                }
+                            }
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

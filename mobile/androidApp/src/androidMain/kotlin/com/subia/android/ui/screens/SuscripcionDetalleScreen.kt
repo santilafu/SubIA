@@ -1,5 +1,6 @@
 package com.subia.android.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -18,9 +24,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -36,14 +44,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.subia.android.ui.ServiceLogo
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
+import com.subia.android.ui.theme.Indigo400
+import com.subia.android.ui.theme.Indigo500
 import com.subia.shared.viewmodel.SuscripcionesUiState
 import com.subia.shared.viewmodel.SuscripcionesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla de detalle de una suscripción con opciones de editar y eliminar. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun SuscripcionDetalleScreen(
     suscripcionId: Long,
@@ -55,14 +77,12 @@ fun SuscripcionDetalleScreen(
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Busca la suscripción actual en el estado cargado
     val suscripcion = when (val state = uiState) {
         is SuscripcionesUiState.Success -> state.suscripciones.find { it.id == suscripcionId }
         is SuscripcionesUiState.Offline -> state.suscripciones.find { it.id == suscripcionId }
         else -> null
     }
 
-    // Observar errores para mostrarlos como snackbar
     LaunchedEffect(uiState) {
         if (uiState is SuscripcionesUiState.Error) {
             snackbarHostState.showSnackbar((uiState as SuscripcionesUiState.Error).mensaje)
@@ -77,17 +97,6 @@ fun SuscripcionDetalleScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
-                },
-                actions = {
-                    suscripcion?.let {
-                        IconButton(onClick = { onNavigateToEditar(suscripcionId) }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Editar")
-                        }
-                        IconButton(onClick = { mostrarDialogoEliminar = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Eliminar",
-                                tint = MaterialTheme.colorScheme.error)
-                        }
-                    }
                 }
             )
         },
@@ -99,16 +108,117 @@ fun SuscripcionDetalleScreen(
             }
         } else {
             Column(
-                modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
             ) {
-                DetalleRow("Nombre", suscripcion.nombre)
-                if (suscripcion.descripcion.isNotBlank()) DetalleRow("Descripción", suscripcion.descripcion)
-                DetalleRow("Importe", "${suscripcion.precio} ${suscripcion.moneda}")
-                DetalleRow("Facturación", periodoCiclo(suscripcion.periodoFacturacion))
-                DetalleRow("Próxima renovación", suscripcion.fechaRenovacion)
-                DetalleRow("Estado", if (suscripcion.activa) "Activa" else "Inactiva")
-                if (suscripcion.notas.isNotBlank()) DetalleRow("Notas", suscripcion.notas)
+                // Cabecera con logo y nombre
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.surface,
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                                )
+                            )
+                        )
+                        .padding(vertical = 28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ServiceLogo(nombre = suscripcion.nombre, size = 72.dp)
+                    Spacer(Modifier.height(14.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(
+                                SpanStyle(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(GradientIndigoStart, GradientIndigoEnd, Color(0xFFA78BFA)),
+                                        start = Offset(0f, 0f),
+                                        end = Offset(Float.POSITIVE_INFINITY, 0f)
+                                    ),
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 24.sp
+                                )
+                            ) {
+                                append(suscripcion.nombre)
+                            }
+                        }
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = if (suscripcion.activa) "Activa" else "Inactiva",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (suscripcion.activa) Indigo400 else MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 0.8.sp
+                    )
+                }
+
+                // Filas de información
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                ) {
+                    DetalleRow("Importe", "${suscripcion.precio} ${suscripcion.moneda}")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                    DetalleRow("Facturación", periodoCiclo(suscripcion.periodoFacturacion))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                    DetalleRow("Próxima renovación", suscripcion.fechaRenovacion)
+                    if (suscripcion.descripcion.isNotBlank()) {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        DetalleRow("Descripción", suscripcion.descripcion)
+                    }
+                    if (suscripcion.notas.isNotBlank()) {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        DetalleRow("Notas", suscripcion.notas)
+                    }
+                }
+
+                // Botones de acción
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    suscripcion.let {
+                        // Botón editar — filled indigo
+                        Button(
+                            onClick = { onNavigateToEditar(suscripcionId) },
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Indigo500,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Editar suscripción", fontWeight = FontWeight.SemiBold)
+                        }
+                        // Botón eliminar — outlined error
+                        OutlinedButton(
+                            onClick = { mostrarDialogoEliminar = true },
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+                            )
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Eliminar suscripción", fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
             }
         }
 
@@ -137,11 +247,26 @@ fun SuscripcionDetalleScreen(
 
 @Composable
 private fun DetalleRow(etiqueta: String, valor: String) {
-    Column {
-        Text(etiqueta, style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(2.dp))
-        Text(valor, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            etiqueta,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(0.4f)
+        )
+        Text(
+            valor,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(0.6f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.End
+        )
     }
 }
 

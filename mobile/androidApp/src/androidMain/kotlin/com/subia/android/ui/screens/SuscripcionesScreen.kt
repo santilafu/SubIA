@@ -1,6 +1,7 @@
 package com.subia.android.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,11 +23,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Subscriptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -44,11 +48,23 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.subia.android.ui.ServiceLogo
+import com.subia.android.ui.theme.GradientIndigoEnd
+import com.subia.android.ui.theme.GradientIndigoStart
+import com.subia.android.ui.theme.Indigo400
+import com.subia.android.ui.theme.Indigo500
 import com.subia.shared.model.Category
 import com.subia.shared.model.Subscription
 import com.subia.shared.viewmodel.SuscripcionesUiState
@@ -74,7 +90,7 @@ fun SuscripcionesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToNueva,
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = Indigo500,
                 elevation = FloatingActionButtonDefaults.elevation(4.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Añadir", tint = Color.White)
@@ -90,13 +106,7 @@ fun SuscripcionesScreen(
                 is SuscripcionesUiState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
                 is SuscripcionesUiState.Success -> {
                     if (state.suscripciones.isEmpty() && state.categoriaSeleccionada == null) {
-                        Box(Modifier.fillMaxSize(), Alignment.Center) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Sin suscripciones", style = MaterialTheme.typography.titleMedium)
-                                Spacer(Modifier.height(4.dp))
-                                Text("Toca + para añadir la primera", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
+                        EmptyStateSuscripciones()
                     } else {
                         ListaSuscripciones(
                             suscripciones = state.suscripciones,
@@ -130,7 +140,33 @@ fun SuscripcionesScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun EmptyStateSuscripciones() {
+    Box(Modifier.fillMaxSize(), Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.Subscriptions,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                "Sin suscripciones",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "Toca + para añadir la primera",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalTextApi::class)
 @Composable
 private fun ListaSuscripciones(
     suscripciones: List<Subscription>,
@@ -139,20 +175,60 @@ private fun ListaSuscripciones(
     onNavigateToDetalle: (Long) -> Unit,
     onFiltrar: (Long?) -> Unit
 ) {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(GradientIndigoStart, GradientIndigoEnd, Color(0xFFA78BFA)),
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         item {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text("Suscripciones", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
-                Text("${suscripciones.size} activas", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            SpanStyle(
+                                brush = gradientBrush,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 28.sp
+                            )
+                        ) {
+                            append("Mis suscripciones")
+                        }
+                    }
+                )
+                // Badge con el conteo
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Indigo500)
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "${suscripciones.size}",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
             }
         }
 
         stickyHeader {
-            Surface(tonalElevation = 2.dp) {
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 2.dp
+            ) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -161,7 +237,11 @@ private fun ListaSuscripciones(
                         FilterChip(
                             selected = categoriaSeleccionada == null,
                             onClick = { onFiltrar(null) },
-                            label = { Text("Todas") }
+                            label = { Text("Todas") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Indigo500,
+                                selectedLabelColor = Color.White
+                            )
                         )
                     }
                     items(categorias, key = { it.id }) { cat ->
@@ -171,7 +251,11 @@ private fun ListaSuscripciones(
                                 if (categoriaSeleccionada == cat.id) onFiltrar(null)
                                 else onFiltrar(cat.id)
                             },
-                            label = { Text(cat.nombre) }
+                            label = { Text(cat.nombre) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Indigo500,
+                                selectedLabelColor = Color.White
+                            )
                         )
                     }
                 }
@@ -184,10 +268,13 @@ private fun ListaSuscripciones(
                     modifier = Modifier.fillMaxWidth().padding(32.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        "No hay suscripciones en esta categoría",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "No hay suscripciones en esta categoría",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         } else {
@@ -200,16 +287,31 @@ private fun ListaSuscripciones(
 
 @Composable
 private fun SuscripcionCard(sub: Subscription, onNavigateToDetalle: (Long) -> Unit, modifier: Modifier = Modifier) {
-    Card(
+    // Borde izquierdo acento + contenedor de tarjeta
+    Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
             .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
-            .clickable { onNavigateToDetalle(sub.id) },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            .clickable { onNavigateToDetalle(sub.id) }
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        // Acento izquierdo indigo
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(80.dp)
+                .background(
+                    brush = Brush.verticalGradient(listOf(GradientIndigoStart, GradientIndigoEnd)),
+                    shape = RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp)
+                )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 14.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             ServiceLogo(nombre = sub.nombre, size = 44.dp)
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
@@ -226,7 +328,7 @@ private fun SuscripcionCard(sub: Subscription, onNavigateToDetalle: (Long) -> Un
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("%.2f €".format(sub.precio), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text("%.2f €".format(sub.precio), fontWeight = FontWeight.Bold, color = Indigo400)
                 Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
             }
         }
