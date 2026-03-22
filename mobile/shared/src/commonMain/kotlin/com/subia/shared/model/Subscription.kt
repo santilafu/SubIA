@@ -21,12 +21,12 @@ data class Subscription(
 /** Petición para crear o actualizar una suscripción. */
 @Serializable
 data class NuevaSuscripcionRequest(
-    val nombre: String,
-    val descripcion: String = "",
-    val precio: Double,
-    val moneda: String = "EUR",
-    val periodoFacturacion: String,
-    val fechaRenovacion: String,
-    val categoriaId: Long? = null,
-    val notas: String = ""
+    @SerialName("name") val nombre: String,
+    @SerialName("description") val descripcion: String = "",
+    @SerialName("price") val precio: Double,
+    @SerialName("currency") val moneda: String = "EUR",
+    @SerialName("billingCycle") val periodoFacturacion: String,
+    @SerialName("renewalDate") val fechaRenovacion: String,
+    @SerialName("categoryId") val categoriaId: Long? = null,
+    @SerialName("notes") val notas: String = ""
 )
