@@ -97,7 +97,10 @@ class CatalogService {
             CatalogItem("Pandora Premium",         BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Radio y streaming de música personalizado",                                     "musica", 30, "pandora.com",     "https://www.pandora.com/account/subscription"),
             CatalogItem("Beatport Link",           BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Streaming de música electrónica para DJs",                                      "musica", 30, "beatport.com",    "https://www.beatport.com/account/subscription"),
             CatalogItem("LiveOne Premium",         BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Streaming de música y radio en vivo",                                           "musica", 7,  "livexlive.com",   "https://liveone.com/account"),
-            CatalogItem("Mixcloud Select",         BigDecimal("6.05"),   "EUR", BillingCycle.MONTHLY, "Acceso ilimitado a mixtapes y sets de DJ",                                      "musica", domain = "mixcloud.com",   cancelUrl = "https://www.mixcloud.com/settings/")
+            CatalogItem("Mixcloud Select",         BigDecimal("6.05"),   "EUR", BillingCycle.MONTHLY, "Acceso ilimitado a mixtapes y sets de DJ",                                      "musica", domain = "mixcloud.com",   cancelUrl = "https://www.mixcloud.com/settings/"),
+            CatalogItem("iHeart Radio All Access", BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Radio en vivo, podcasts y música sin anuncios — catálogo completo",             "musica", domain = "iheart.com",     cancelUrl = "https://www.iheart.com/subscription/"),
+            CatalogItem("Resso Premium",           BigDecimal("3.62"),   "EUR", BillingCycle.MONTHLY, "Streaming de música con letras interactivas y clips de vídeo",                  "musica", domain = "resso.com",      cancelUrl = "https://www.resso.com/account"),
+            CatalogItem("Pocket Casts Plus",       BigDecimal("4.84"),   "EUR", BillingCycle.MONTHLY, "El mejor cliente de podcasts para Android e iOS",                               "musica", domain = "pocketcasts.com", cancelUrl = "https://pocketcasts.com/account")
         ),
 
         // ── Software y productividad ─────────────────────────────────────────────
@@ -142,7 +145,13 @@ class CatalogService {
             CatalogItem("Jira Software Standard",  BigDecimal("9.67"),   "EUR", BillingCycle.MONTHLY, "Gestión ágil de proyectos de software",                                         "software", 14, "atlassian.com",       "https://support.atlassian.com/billing-and-licensing/docs/cancel-your-subscription"),
             CatalogItem("Confluence Standard",     BigDecimal("6.04"),   "EUR", BillingCycle.MONTHLY, "Wiki corporativa y gestión del conocimiento",                                   "software", 14, "atlassian.com",       "https://support.atlassian.com/billing-and-licensing/docs/cancel-your-subscription"),
             CatalogItem("CleanMyMac Business",     BigDecimal("14.52"),  "EUR", BillingCycle.MONTHLY, "Optimización y limpieza de Mac",                                                "software", 7,  "cleanmymac.com",      "https://account.macpaw.com"),
-            CatalogItem("X Premium",               BigDecimal("14.52"),  "EUR", BillingCycle.MONTHLY, "Verificación, editar tweets y funciones extra en X",                            "software", domain = "x.com",              cancelUrl = "https://x.com/settings/account/subscription")
+            CatalogItem("X Premium",               BigDecimal("14.52"),  "EUR", BillingCycle.MONTHLY, "Verificación, editar tweets y funciones extra en X",                            "software", domain = "x.com",              cancelUrl = "https://x.com/settings/account/subscription"),
+            CatalogItem("Telegram Premium",        BigDecimal("6.04"),   "EUR", BillingCycle.MONTHLY, "Sin límites de tamaño, stickers exclusivos, traducción y velocidad extra",       "software", domain = "telegram.org",       cancelUrl = "https://t.me/premiumbot"),
+            CatalogItem("TickTick Premium",        BigDecimal("3.62"),   "EUR", BillingCycle.MONTHLY, "Gestor de tareas con Pomodoro, hábitos, calendario y widgets",                   "software", domain = "ticktick.com",       cancelUrl = "https://ticktick.com/home#settings/subscription"),
+            CatalogItem("Any.do Premium",          BigDecimal("4.84"),   "EUR", BillingCycle.MONTHLY, "App de tareas, recordatorios de ubicación y planificador diario",                "software", 7, "any.do",                "https://app.any.do/account"),
+            CatalogItem("Basecamp Business",       BigDecimal("121.00"), "EUR", BillingCycle.MONTHLY, "Gestión de proyectos todo en uno — mensajes, tareas, docs y chats",              "software", 30, "basecamp.com",          "https://basecamp.com/account/billing"),
+            CatalogItem("Notion Team",             BigDecimal("18.14"),  "EUR", BillingCycle.MONTHLY, "Notion para equipos — colaboración, permisos y espacio compartido",               "software", 14, "notion.so",             "https://www.notion.so/profile/plans"),
+            CatalogItem("Quizlet Plus",            BigDecimal("7.25"),   "EUR", BillingCycle.MONTHLY, "Flashcards y herramientas de estudio con IA y sin anuncios",                     "software", 7, "quizlet.com",           "https://quizlet.com/settings/account")
         ),
 
         // ── Almacenamiento en la nube ────────────────────────────────────────────
@@ -185,7 +194,15 @@ class CatalogService {
             CatalogItem("Discord Nitro Basic",     BigDecimal("3.62"),   "EUR", BillingCycle.MONTHLY, "Emojis animados y mayor límite de archivos en Discord",                         "gaming", domain = "discord.com",       cancelUrl = "https://discord.com/settings/subscriptions"),
             CatalogItem("Ubisoft+ Essential",      BigDecimal("17.99"),  "EUR", BillingCycle.MONTHLY, "Catálogo de juegos Ubisoft en PC",                                              "gaming", 7,  "ubisoftplus.com",    "https://ubisoftconnect.com/en-US/ubisoftplus/subscription"),
             CatalogItem("Roblox Premium 1000",     BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "1000 Robux/mes y ventajas de trading en Roblox",                                "gaming", domain = "roblox.com",        cancelUrl = "https://www.roblox.com/account/membership"),
-            CatalogItem("Xbox PC Game Pass",       BigDecimal("14.51"),  "EUR", BillingCycle.MONTHLY, "Catálogo de juegos para PC + EA Play incluido",                                 "gaming", 30, "xbox.com",           "https://account.microsoft.com/services")
+            CatalogItem("Xbox PC Game Pass",       BigDecimal("14.51"),  "EUR", BillingCycle.MONTHLY, "Catálogo de juegos para PC + EA Play incluido",                                 "gaming", 30, "xbox.com",           "https://account.microsoft.com/services"),
+            CatalogItem("Google Play Pass",        BigDecimal("5.44"),   "EUR", BillingCycle.MONTHLY, "Acceso a 800+ apps y juegos premium sin anuncios ni compras integradas",        "gaming", 10, "play.google.com",    "https://play.google.com/store/account/subscriptions"),
+            CatalogItem("Chess.com Diamond",       BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Lecciones, análisis ilimitados y partidas clasificadas sin anuncios",            "gaming", 7,  "chess.com",          "https://www.chess.com/settings/subscription"),
+            CatalogItem("Clash of Clans Gold Pass",BigDecimal("6.04"),   "EUR", BillingCycle.MONTHLY, "Misiones exclusivas, cosméticos y recompensas mensuales en Clash of Clans",     "gaming", domain = "supercell.com",    cancelUrl = "https://support.supercell.com"),
+            CatalogItem("Pokémon GO Adventure",    BigDecimal("6.04"),   "EUR", BillingCycle.MONTHLY, "Pase de aventura mensual con incursiones remotas y elementos exclusivos",        "gaming", domain = "pokemongo.com",    cancelUrl = "https://niantic.helpshift.com"),
+            CatalogItem("Clash Royale Pass",       BigDecimal("5.44"),   "EUR", BillingCycle.MONTHLY, "Pase Royale mensual con recompensas, mazo y cosméticos exclusivos",              "gaming", domain = "supercell.com",    cancelUrl = "https://support.supercell.com"),
+            CatalogItem("Brawl Stars Brawl Pass",  BigDecimal("5.44"),   "EUR", BillingCycle.MONTHLY, "Pase de temporada con Brawlers, pins y recompensas exclusivos",                 "gaming", domain = "supercell.com",    cancelUrl = "https://support.supercell.com"),
+            CatalogItem("Duolingo Super",          BigDecimal("8.46"),   "EUR", BillingCycle.MONTHLY, "Duolingo sin anuncios, vidas ilimitadas y racha reparadora",                    "gaming", domain = "duolingo.com",     cancelUrl = "https://www.duolingo.com/settings/super"),
+            CatalogItem("Stadia Pro",              BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Juegos en la nube de Google con calidad 4K y descuentos exclusivos",            "gaming", domain = "stadia.google.com", cancelUrl = "https://stadia.google.com/subscription")
         ),
 
         // ── Seguridad y privacidad ───────────────────────────────────────────────
@@ -257,7 +274,16 @@ class CatalogService {
             CatalogItem("Zwift",                   BigDecimal("20.57"),  "EUR", BillingCycle.MONTHLY, "Ciclismo y running indoor con mundo virtual",                                   "salud", 14, "zwift.com",          "https://www.zwift.com/cancel"),
             CatalogItem("TrainerRoad",             BigDecimal("24.19"),  "EUR", BillingCycle.MONTHLY, "Entrenamiento de ciclismo basado en datos y zonas",                             "salud", 30, "trainerroad.com",    "https://www.trainerroad.com/account"),
             CatalogItem("Sweat App",               BigDecimal("24.19"),  "EUR", BillingCycle.MONTHLY, "Programas de fitness para mujeres (BBG, LIFT, BREATHE)",                        "salud", 7,  "sweat.com",          "https://www.sweat.com/account/membership"),
-            CatalogItem("Centr Premium",           BigDecimal("36.29"),  "EUR", BillingCycle.MONTHLY, "App de fitness de Chris Hemsworth — gym y mindfulness",                         "salud", 7,  "centr.com",          "https://centr.com/account/subscription")
+            CatalogItem("Centr Premium",           BigDecimal("36.29"),  "EUR", BillingCycle.MONTHLY, "App de fitness de Chris Hemsworth — gym y mindfulness",                         "salud", 7,  "centr.com",          "https://centr.com/account/subscription"),
+            CatalogItem("Lifesum Premium",         BigDecimal("6.05"),   "EUR", BillingCycle.MONTHLY, "App de dieta y nutrición con planes personalizados y seguimiento calórico",      "salud", 7,  "lifesum.com",        "https://app.lifesum.com/settings/subscription"),
+            CatalogItem("Cronometer Gold",         BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Seguimiento nutricional detallado con micronutrientes y análisis avanzado",      "salud", 7,  "cronometer.com",     "https://cronometer.com/account/"),
+            CatalogItem("BetterSleep Premium",     BigDecimal("8.46"),   "EUR", BillingCycle.MONTHLY, "Mejora tu sueño con sonidos relajantes, meditaciones y seguimiento nocturno",    "salud", 7,  "bettersleep.com",    "https://www.bettersleep.com/account"),
+            CatalogItem("Lumosity Premium",        BigDecimal("14.51"),  "EUR", BillingCycle.MONTHLY, "Entrenamiento cerebral científico con +60 juegos cognitivos",                    "salud", 7,  "lumosity.com",       "https://www.lumosity.com/account/subscription"),
+            CatalogItem("Waking Up Premium",       BigDecimal("14.51"),  "EUR", BillingCycle.MONTHLY, "Meditación guiada por Sam Harris — mindfulness y filosofía",                     "salud", 30, "wakingup.com",       "https://app.wakingup.com/settings"),
+            CatalogItem("Meditopia Premium",       BigDecimal("9.67"),   "EUR", BillingCycle.MONTHLY, "Meditación en español con sesiones guiadas para dormir y reducir el estrés",    "salud", 7,  "meditopia.com",      "https://meditopia.com/account"),
+            CatalogItem("8fit Pro",                BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Rutinas de ejercicio en casa y planes de nutrición personalizados",              "salud", 7,  "8fit.com",           "https://8fit.com/settings"),
+            CatalogItem("Daily Yoga Premium",      BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Más de 500 clases de yoga, meditación y pilates para todos los niveles",        "salud", 7,  "dailyyoga.com",      "https://www.dailyyoga.com/account"),
+            CatalogItem("Endel Premium",           BigDecimal("7.26"),   "EUR", BillingCycle.MONTHLY, "Paisajes sonoros adaptativos con IA para concentración y sueño",                 "salud", 7,  "endel.io",           "https://endel.io/account")
         ),
 
         // ── Pruebas gratuitas ────────────────────────────────────────────────────
@@ -325,7 +351,14 @@ class CatalogService {
             CatalogItem("Wallet Pro",              BigDecimal("6.05"),   "EUR", BillingCycle.MONTHLY, "Control de gastos con sincronización bancaria automática",                      "finanzas", 30, "budgetbakers.com",   "https://budgetbakers.com/account"),
             CatalogItem("Toshl Finance Pro",       BigDecimal("4.84"),   "EUR", BillingCycle.MONTHLY, "Registro de gastos e ingresos con visualizaciones",                             "finanzas", 30, "toshl.com",          "https://toshl.com/account"),
             CatalogItem("PocketGuard Plus",        BigDecimal("13.28"),  "EUR", BillingCycle.MONTHLY, "Presupuesto simplificado — cuánto puedo gastar hoy",                            "finanzas", 7,  "pocketguard.com",    "https://pocketguard.com/support"),
-            CatalogItem("Spendee Premium",         BigDecimal("4.84"),   "EUR", BillingCycle.MONTHLY, "App de presupuesto compartido para familias y parejas",                         "finanzas", 7,  "spendee.com",        "https://spendee.com/support")
+            CatalogItem("Spendee Premium",         BigDecimal("4.84"),   "EUR", BillingCycle.MONTHLY, "App de presupuesto compartido para familias y parejas",                         "finanzas", 7,  "spendee.com",        "https://spendee.com/support"),
+            CatalogItem("Splitwise Pro",           BigDecimal("4.84"),   "EUR", BillingCycle.MONTHLY, "Divide gastos con amigos y roommates sin discusiones",                           "finanzas", domain = "splitwise.com",    cancelUrl = "https://splitwise.com/account/settings"),
+            CatalogItem("Bunq Easy Bank",          BigDecimal("10.88"),  "EUR", BillingCycle.MONTHLY, "Neobank europeo con cuentas múltiples, tarjetas metal y cashback ecológico",    "finanzas", domain = "bunq.com",         cancelUrl = "https://www.bunq.com/card/subscription"),
+            CatalogItem("Fintonic Premium",        BigDecimal("3.62"),   "EUR", BillingCycle.MONTHLY, "Control total de tus finanzas con alertas inteligentes y análisis de gastos",   "finanzas", 30, "fintonic.com",       "https://www.fintonic.com/settings"),
+            CatalogItem("Money Manager Pro",       BigDecimal("6.04"),   "EUR", BillingCycle.MONTHLY, "Registro de ingresos y gastos con gráficos y balance detallado",                "finanzas", domain = "moneymanager.com", cancelUrl = "https://moneymanager.com/account"),
+            CatalogItem("Tricount Premium",        BigDecimal("2.42"),   "EUR", BillingCycle.MONTHLY, "Divide los gastos de grupo en viajes y salidas sin complicaciones",              "finanzas", domain = "tricount.com",     cancelUrl = "https://www.tricount.com/settings"),
+            CatalogItem("Robinhood Gold",          BigDecimal("7.25"),   "EUR", BillingCycle.MONTHLY, "Inversiones y trading con tasas reducidas y cuenta margen",                     "finanzas", domain = "robinhood.com",    cancelUrl = "https://robinhood.com/settings/gold"),
+            CatalogItem("Revolut Ultra",           BigDecimal("60.50"),  "EUR", BillingCycle.MONTHLY, "Plan Revolut máximo — seguro Revolut, concierge 24h y cashback top",            "finanzas", domain = "revolut.com",      cancelUrl = "https://app.revolut.com/subscription")
         ),
 
         // ── Educación y cursos ───────────────────────────────────────────────────
@@ -341,7 +374,15 @@ class CatalogService {
             CatalogItem("DataCamp Standard",       BigDecimal("25.63"),  "EUR", BillingCycle.MONTHLY, "Aprende ciencia de datos y Python/R de forma práctica",                         "educacion", domain = "datacamp.com",     cancelUrl = "https://www.datacamp.com/profile/account_settings"),
             CatalogItem("Frontend Masters",        BigDecimal("39.96"),  "EUR", BillingCycle.MONTHLY, "Cursos avanzados de desarrollo web y JavaScript",                               "educacion", domain = "frontendmasters.com", cancelUrl = "https://frontendmasters.com/settings/subscription"),
             CatalogItem("Udemy Personal Plan",     BigDecimal("19.99"),  "EUR", BillingCycle.MONTHLY, "Acceso a cursos seleccionados del catálogo Udemy",                              "educacion", domain = "udemy.com",        cancelUrl = "https://www.udemy.com/user/subscription"),
-            CatalogItem("Preply Business",         BigDecimal("90.75"),  "EUR", BillingCycle.MONTHLY, "Clases particulares de idiomas con tutores nativos",                            "educacion", domain = "preply.com",       cancelUrl = "https://preply.com/en/account/settings")
+            CatalogItem("Preply Business",         BigDecimal("90.75"),  "EUR", BillingCycle.MONTHLY, "Clases particulares de idiomas con tutores nativos",                            "educacion", domain = "preply.com",       cancelUrl = "https://preply.com/en/account/settings"),
+            CatalogItem("Photomath Plus",          BigDecimal("9.67"),   "EUR", BillingCycle.MONTHLY, "Resuelve problemas matemáticos paso a paso con la cámara del móvil",             "educacion", 7,  "photomath.com",      "https://photomath.com/account"),
+            CatalogItem("SoloLearn Pro",           BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Aprende programación con rutas de aprendizaje, proyectos y comunidad",           "educacion", 7,  "sololearn.com",      "https://www.sololearn.com/settings"),
+            CatalogItem("Mimo Premium",            BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Aprende a programar en 5 minutos al día con proyectos reales",                   "educacion", 7,  "getmimo.com",        "https://getmimo.com/settings"),
+            CatalogItem("Khan Academy SAT Prep",   BigDecimal("19.35"),  "EUR", BillingCycle.MONTHLY, "Preparación oficial para el SAT con práctica adaptativa",                        "educacion", domain = "khanacademy.org",  cancelUrl = "https://www.khanacademy.org/account"),
+            CatalogItem("Duolingo Super",          BigDecimal("8.46"),   "EUR", BillingCycle.MONTHLY, "Duolingo sin anuncios, vidas ilimitadas y racha reparadora",                     "educacion", 14, "duolingo.com",       "https://www.duolingo.com/settings/super"),
+            CatalogItem("Lingoda Sprint",          BigDecimal("99.00"),  "EUR", BillingCycle.MONTHLY, "Clases de idiomas en vivo con profesores nativos — sprints con reembolso",       "educacion", domain = "lingoda.com",      cancelUrl = "https://learn.lingoda.com/profile/subscription"),
+            CatalogItem("italki Credits",          BigDecimal("24.19"),  "EUR", BillingCycle.MONTHLY, "Clases con profesores de idiomas de todo el mundo a tu ritmo",                   "educacion", domain = "italki.com",       cancelUrl = "https://www.italki.com/settings"),
+            CatalogItem("Pimsleur Premium",        BigDecimal("21.77"),  "EUR", BillingCycle.MONTHLY, "Método de idiomas basado en audio — aprende escuchando sin leer",                "educacion", 7,  "pimsleur.com",       "https://www.pimsleur.com/account")
         ),
 
         // ── Creatividad y foto ───────────────────────────────────────────────────
@@ -354,7 +395,15 @@ class CatalogService {
             CatalogItem("Adobe Premiere Rush",     BigDecimal("14.51"),  "EUR", BillingCycle.MONTHLY, "Edición de vídeo multi-plataforma para creadores",                              "creatividad", 30, "adobe.com",         "https://account.adobe.com/plans"),
             CatalogItem("Splice Premium",          BigDecimal("6.05"),   "EUR", BillingCycle.MONTHLY, "Editor de vídeo para móvil con librería de sonidos",                            "creatividad", 7,  "splice.com",        "https://splice.com/account"),
             CatalogItem("Unfold Pro",              BigDecimal("1.33"),   "EUR", BillingCycle.MONTHLY, "Plantillas premium para historias de Instagram y TikTok",                       "creatividad", 7,  "unfold.com",        "https://unfold.com/pages/faq"),
-            CatalogItem("Afterlight",              BigDecimal("3.62"),   "EUR", BillingCycle.MONTHLY, "Edición de fotos artística con filtros únicos",                                 "creatividad", domain = "afterlight.us",     cancelUrl = "https://afterlight.us/support")
+            CatalogItem("Afterlight",              BigDecimal("3.62"),   "EUR", BillingCycle.MONTHLY, "Edición de fotos artística con filtros únicos",                                 "creatividad", domain = "afterlight.us",     cancelUrl = "https://afterlight.us/support"),
+            CatalogItem("PicsArt Gold",            BigDecimal("14.51"),  "EUR", BillingCycle.MONTHLY, "Editor de fotos y vídeos con stickers, collages y herramientas creativas",       "creatividad", 7,  "picsart.com",       "https://picsart.com/account/subscriptions"),
+            CatalogItem("Pixlr Premium",           BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Editor de fotos y diseño gráfico con IA online y en móvil",                     "creatividad", domain = "pixlr.com",         cancelUrl = "https://pixlr.com/account"),
+            CatalogItem("Remini Pro",              BigDecimal("9.67"),   "EUR", BillingCycle.MONTHLY, "Mejora la calidad de fotos antiguas y borrosas con IA",                          "creatividad", 7,  "remini.ai",         "https://remini.ai/settings"),
+            CatalogItem("Prequel Premium",         BigDecimal("9.67"),   "EUR", BillingCycle.MONTHLY, "Filtros y efectos de vídeo analógicos y retro para Instagram y TikTok",         "creatividad", 7,  "prequel.app",       "https://prequel.app/settings"),
+            CatalogItem("YouCam Perfect Premium",  BigDecimal("6.04"),   "EUR", BillingCycle.MONTHLY, "Edición de selfies con retoques de piel, maquillaje y stickers AR",             "creatividad", 7,  "youcam.com",        "https://www.youcam.com/subscription"),
+            CatalogItem("Polarr Pro",              BigDecimal("9.67"),   "EUR", BillingCycle.MONTHLY, "Editor de fotos avanzado con filtros propios y edición por lotes",              "creatividad", 7,  "polarr.com",        "https://www.polarr.com/account"),
+            CatalogItem("Veed Pro",                BigDecimal("24.19"),  "EUR", BillingCycle.MONTHLY, "Editor de vídeo online con subtítulos automáticos y grabación de pantalla",     "creatividad", 7,  "veed.io",           "https://www.veed.io/account/subscription"),
+            CatalogItem("Adobe Express Premium",   BigDecimal("12.09"),  "EUR", BillingCycle.MONTHLY, "Diseño gráfico rápido — plantillas, vídeo y redes sociales con Adobe",         "creatividad", 30, "express.adobe.com", "https://account.adobe.com/plans")
         ),
 
         // ── Citas y social ───────────────────────────────────────────────────────
@@ -366,7 +415,15 @@ class CatalogService {
             CatalogItem("Meetic Premium",          BigDecimal("36.29"),  "EUR", BillingCycle.MONTHLY, "Citas online — perfil destacado y chat sin límites",                            "citas", 3,  "meetic.es",      "https://www.meetic.es/my/account/settings/subscription"),
             CatalogItem("Badoo Premium",           BigDecimal("24.19"),  "EUR", BillingCycle.MONTHLY, "Súper poderes en Badoo — ver quién te gustó",                                   "citas", domain = "badoo.com",     cancelUrl = "https://badoo.com/settings/premium"),
             CatalogItem("Grindr Unlimited",        BigDecimal("36.29"),  "EUR", BillingCycle.MONTHLY, "Chat sin anuncios, ver quién te visitó en Grindr",                              "citas", 7,  "grindr.com",     "https://help.grindr.com/hc/en-us/articles/115001667531"),
-            CatalogItem("OkCupid A-List",          BigDecimal("30.24"),  "EUR", BillingCycle.MONTHLY, "Ver quién te gustó y sin anuncios en OkCupid",                                  "citas", domain = "okcupid.com",   cancelUrl = "https://www.okcupid.com/faq/a-list-faq")
+            CatalogItem("OkCupid A-List",          BigDecimal("30.24"),  "EUR", BillingCycle.MONTHLY, "Ver quién te gustó y sin anuncios en OkCupid",                                  "citas", domain = "okcupid.com",   cancelUrl = "https://www.okcupid.com/faq/a-list-faq"),
+            CatalogItem("Happn Premium",           BigDecimal("30.24"),  "EUR", BillingCycle.MONTHLY, "Descubre y conecta con personas que cruzaste en la calle",                       "citas", 7,  "happn.com",          "https://www.happn.com/en/subscribe"),
+            CatalogItem("Lovoo VIP",               BigDecimal("39.92"),  "EUR", BillingCycle.MONTHLY, "App de citas con IA matchmaking, perfiles destacados y chat ilimitado",          "citas", domain = "lovoo.com",      cancelUrl = "https://www.lovoo.com/vip"),
+            CatalogItem("Coffee Meets Bagel",      BigDecimal("36.29"),  "EUR", BillingCycle.MONTHLY, "Citas de calidad — 1 match al día para relaciones más serias",                  "citas", 7,  "coffeemeetsbagel.com","https://coffeemeetsbagel.com/settings/subscription"),
+            CatalogItem("Zoosk Premium",           BigDecimal("30.24"),  "EUR", BillingCycle.MONTHLY, "Red social de citas con algoritmo de aprendizaje y SmartPick",                   "citas", domain = "zoosk.com",      cancelUrl = "https://www.zoosk.com/account"),
+            CatalogItem("eHarmony Premium",        BigDecimal("55.83"),  "EUR", BillingCycle.MONTHLY, "Citas serias con test de compatibilidad y matches profundos",                    "citas", domain = "eharmony.com",   cancelUrl = "https://www.eharmony.com/settings/billing"),
+            CatalogItem("Pairs Premium",           BigDecimal("36.29"),  "EUR", BillingCycle.MONTHLY, "App de citas asiática popular con verificación de identidad",                   "citas", domain = "pairs.lv",       cancelUrl = "https://pairs.lv/settings"),
+            CatalogItem("Hinge Preferred",         BigDecimal("24.19"),  "EUR", BillingCycle.MONTHLY, "Modo preferente de Hinge con más filtros y visibilidad extra",                   "citas", domain = "hinge.co",       cancelUrl = "https://hingeapp.zendesk.com/hc/en-us/articles/360007194833"),
+            CatalogItem("MiuMeet Premium",         BigDecimal("18.14"),  "EUR", BillingCycle.MONTHLY, "App de citas en tiempo real con mapa de personas cercanas",                     "citas", domain = "miumeet.com",    cancelUrl = "https://www.miumeet.com/settings")
         )
     )
 
@@ -376,31 +433,23 @@ class CatalogService {
      * Si no hay coincidencia, devuelve todos los servicios ordenados por nombre.
      */
     fun getItemsForCategory(categoryName: String): List<CatalogItem> {
-        val name = categoryName.lowercase()
-        val key = when {
-            name.contains("ia") || name.contains("ai") || name.contains("intelig") -> "ia"
-            name.contains("stream") || name.contains("video") || name.contains("entret") -> "streaming"
-            name.contains("músic") || name.contains("music") || name.contains("audio") -> "musica"
-            name.contains("soft") || name.contains("produc") || name.contains("diseño")
-                    || name.contains("herramient") -> "software"
-            name.contains("cloud") || name.contains("nube") || name.contains("almac")
-                    || name.contains("backup") -> "cloud"
-            name.contains("gam") || name.contains("jueg") || name.contains("xbox")
-                    || name.contains("playstation") || name.contains("nintendo") -> "gaming"
-            name.contains("segur") || name.contains("privac") || name.contains("vpn")
-                    || name.contains("contrase") || name.contains("antivir") -> "seguridad"
-            name.contains("notici") || name.contains("lectur") || name.contains("libro")
-                    || name.contains("pren") -> "noticias"
-            name.contains("salud") || name.contains("deport") || name.contains("fitness")
-                    || name.contains("bienest") -> "salud"
-            name.contains("desarroll") || name.contains("devops") || name.contains("progr")
-                    || name.contains("código") || name.contains("codigo") || name.contains("dev") -> "desarrollo"
-            name.contains("prueba") || name.contains("trial") || name.contains("gratu") -> "prueba"
-            name.contains("finanz") || name.contains("banco") || name.contains("presupuest") -> "finanzas"
-            name.contains("educac") || name.contains("curso") || name.contains("aprendiz") -> "educacion"
-            name.contains("creativid") || name.contains("foto") || name.contains("edici") -> "creatividad"
-            name.contains("citas") || name.contains("dating") || name.contains("social") -> "citas"
-            else -> null
+        val key = when (categoryName.trim()) {
+            "IA"                 -> "ia"
+            "Streaming"          -> "streaming"
+            "Música"             -> "musica"
+            "Software"           -> "software"
+            "Cloud"              -> "cloud"
+            "Gaming"             -> "gaming"
+            "Seguridad"          -> "seguridad"
+            "Noticias y Lectura" -> "noticias"
+            "Salud y Deporte"    -> "salud"
+            "Desarrollo"         -> "desarrollo"
+            "Prueba gratuita"    -> "prueba"
+            "Finanzas"           -> "finanzas"
+            "Educación"          -> "educacion"
+            "Creatividad y foto" -> "creatividad"
+            "Citas y social"     -> "citas"
+            else                 -> null
         }
         return (if (key != null) catalog[key] else null) ?: catalog.values.flatten().sortedBy { it.name }
     }

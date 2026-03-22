@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.subia"
-version = "2.9.0"
+version = "2.10.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21

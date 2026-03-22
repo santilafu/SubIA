@@ -27,28 +27,27 @@ class CatalogBrowserController(
         // Construye un mapa categoryKey → ID de la entidad JPA de Categoría.
         // Permite que el template genere el form POST correcto para cada card del catálogo.
         val categoryKeyToId = categoryService.findAll()
-            .associate { cat ->
-                val n = cat.name.lowercase()
-                val key = when {
-                    n.contains("ia") || n.contains("ai") || n.contains("intelig") -> "ia"
-                    n.contains("stream") || n.contains("video") -> "streaming"
-                    n.contains("músic") || n.contains("music") || n.contains("music") -> "musica"
-                    n.contains("soft") || n.contains("produc") -> "software"
-                    n.contains("cloud") || n.contains("nube") || n.contains("almac") -> "cloud"
-                    n.contains("gam") || n.contains("jueg") -> "gaming"
-                    n.contains("segur") || n.contains("privac") -> "seguridad"
-                    n.contains("notici") || n.contains("lectur") -> "noticias"
-                    n.contains("salud") || n.contains("deport") -> "salud"
-                    n.contains("desarroll") || n.contains("devops") -> "desarrollo"
-                    n.contains("prueba") || n.contains("trial") -> "prueba"
-                    n.contains("finanz") -> "finanzas"
-                    n.contains("educac") || n.contains("educación") -> "educacion"
-                    n.contains("creativid") || n.contains("foto") -> "creatividad"
-                    n.contains("citas") || n.contains("dating") -> "citas"
-                    else -> n
+            .mapNotNull { cat ->
+                val key = when (cat.name) {
+                    "IA"                 -> "ia"
+                    "Streaming"          -> "streaming"
+                    "Música"             -> "musica"
+                    "Software"           -> "software"
+                    "Cloud"              -> "cloud"
+                    "Gaming"             -> "gaming"
+                    "Seguridad"          -> "seguridad"
+                    "Noticias y Lectura" -> "noticias"
+                    "Salud y Deporte"    -> "salud"
+                    "Desarrollo"         -> "desarrollo"
+                    "Prueba gratuita"    -> "prueba"
+                    "Finanzas"           -> "finanzas"
+                    "Educación"          -> "educacion"
+                    "Creatividad y foto" -> "creatividad"
+                    "Citas y social"     -> "citas"
+                    else                 -> null
                 }
-                key to cat.id
-            }
+                if (key != null) key to cat.id else null
+            }.toMap()
         model.addAttribute("categoryKeyToId", categoryKeyToId)
         return "catalog-browser"
     }
