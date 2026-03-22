@@ -122,6 +122,12 @@ class SuscripcionesViewModel(
         emitirFiltradas()
     }
 
+    /** Invalida la caché de suscripciones y recarga desde la red. Llamar tras crear o editar. */
+    fun invalidarCacheYRecargar() {
+        cacheRepository.saveString(CACHE_KEY_SUBS, "")
+        cargar()
+    }
+
     /** Elimina la suscripción con [id] e invalida la caché para forzar recarga. */
     fun eliminar(id: Long) {
         viewModelScope.launch {
