@@ -300,4 +300,4 @@ Consulta [CHANGELOG.md](CHANGELOG.md) para el historial completo de cambios.
 | 2.0.0   | 2026-03-14 | App móvil KMM (Android) + Compose Multiplatform |
 | 2.1.0   | 2026-03-14 | App funcional con datos reales, logos, rename Suscript Wallet |
 | 2.2.0   | 2026-03-22 | Notificaciones, caché persistente, gráfico por categoría, multi-divisa, prefill catálogo, filtros, DatePicker |
-| 2.3.0   | 2026-03-22 | Rename web → SusCriptWallet, fix selector catálogo (ApiResponse), precios con IVA 21% (86 servicios) |
+| 2.3.0   | 2026-03-22 | Rename → SuscriptWallet, selector catálogo inline en formulario, gráfico donut, totales anuales, fix guardar suscripción, navegación desde dashboard, notificación exacta a 3 días |
