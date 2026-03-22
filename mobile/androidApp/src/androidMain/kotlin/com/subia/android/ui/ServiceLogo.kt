@@ -3,10 +3,12 @@ package com.subia.android.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,32 +18,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import coil.compose.SubcomposeAsyncImage
 
+/**
+ * Muestra el logo de un servicio con tres niveles de fallback:
+ *  1. icon.horse (gratuito, fiable)
+ *  2. Google Favicons (sz=128, muy amplia cobertura)
+ *  3. Inicial del nombre sobre fondo de color
+ */
 @Composable
 fun ServiceLogo(
     nombre: String,
     modifier: Modifier = Modifier,
     size: Dp = 48.dp
 ) {
-    val url = getLogoUrl(nombre)
+    val domain = getLogoDomain(nombre)
     val shape = RoundedCornerShape(12.dp)
 
-    if (url.isNotEmpty()) {
-        SubcomposeAsyncImage(
-            model = url,
-            contentDescription = nombre,
-            contentScale = ContentScale.Fit,
-            modifier = modifier
-                .size(size)
-                .clip(shape)
-                .background(Color.White),
-            loading = { LogoFallback(nombre, size, shape = shape, modifier = modifier) },
-            error = { LogoFallback(nombre, size, shape = shape, modifier = modifier) }
-        )
-    } else {
-        LogoFallback(nombre, size, shape = shape, modifier = modifier)
+    if (domain.isEmpty()) {
+        LogoFallback(nombre, size, shape, modifier)
+        return
     }
+
+    val urls = remember(domain) {
+        listOf(
+            "https://icon.horse/icon/$domain",
+            "https://www.google.com/s2/favicons?domain=$domain&sz=128"
+        )
+    }
+    var intentoActual by remember(domain) { mutableIntStateOf(0) }
+
+    if (intentoActual >= urls.size) {
+        LogoFallback(nombre, size, shape, modifier)
+        return
+    }
+
+    SubcomposeAsyncImage(
+        model = urls[intentoActual],
+        contentDescription = nombre,
+        contentScale = ContentScale.Fit,
+        modifier = modifier
+            .size(size)
+            .clip(shape)
+            .background(Color.White),
+        loading = { LogoFallback(nombre, size, shape, modifier) },
+        error = {
+            intentoActual++
+            LogoFallback(nombre, size, shape, modifier)
+        }
+    )
 }
 
 @Composable

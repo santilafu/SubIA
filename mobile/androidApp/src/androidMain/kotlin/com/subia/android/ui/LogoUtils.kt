@@ -1,8 +1,9 @@
 package com.subia.android.ui
 
-fun getLogoUrl(nombre: String): String {
+/** Devuelve el dominio del servicio para cargar su logo, o cadena vacía si no se reconoce. */
+fun getLogoDomain(nombre: String): String {
     val n = nombre.lowercase()
-    val domain = when {
+    return when {
         "netflix" in n -> "netflix.com"
         "spotify" in n -> "spotify.com"
         "amazon prime" in n || "prime video" in n -> "primevideo.com"
@@ -83,7 +84,6 @@ fun getLogoUrl(nombre: String): String {
         "datadog" in n -> "datadoghq.com"
         "linear" in n -> "linear.app"
         "postman" in n -> "postman.com"
-        else -> null
-    } ?: return ""
-    return "https://logo.clearbit.com/$domain"
+        else -> ""
+    }
 }
