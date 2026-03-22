@@ -117,6 +117,14 @@
                     <i class="bi bi-tags"></i>
                     <span>Categorías</span>
                 </a>
+                <a th:href="@{/catalog-browser}"
+                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 no-underline"
+                   th:classappend="${currentPath != null and currentPath.startsWith('/catalog-browser')}
+                       ? ' text-accent border-b-2 border-accent bg-accent/10'
+                       : ' text-slate-400 hover:text-slate-100 hover:bg-white/[0.06]'">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Catálogo</span>
+                </a>
             </div>
         </div>
     </div>

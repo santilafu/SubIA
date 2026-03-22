@@ -136,6 +136,38 @@ class SubscriptionController(
     }
 
     /**
+     * Crea una suscripción nueva a partir de un item del catálogo de servicios.
+     * POST /subscriptions/add-from-catalog
+     *
+     * El template catalog-browser.html genera un formulario por cada card del catálogo.
+     * Si la suscripción es una prueba, la fecha de renovación se fija al fin del trial;
+     * de lo contrario se establece a un mes desde hoy.
+     */
+    @PostMapping("/add-from-catalog")
+    fun addFromCatalog(
+        @RequestParam name: String,
+        @RequestParam(defaultValue = "") description: String,
+        @RequestParam price: BigDecimal,
+        @RequestParam(defaultValue = "EUR") currency: String,
+        @RequestParam billingCycle: BillingCycle,
+        @RequestParam categoryId: Long,
+        @RequestParam(defaultValue = "false") isTrial: Boolean,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) trialEndsAt: LocalDate?
+    ): String {
+        val category = categoryService.findById(categoryId)
+        subscriptionService.save(
+            Subscription(
+                name = name, description = description, price = price, currency = currency,
+                billingCycle = billingCycle,
+                renewalDate = if (isTrial && trialEndsAt != null) trialEndsAt else LocalDate.now().plusMonths(1),
+                category = category, active = true, notes = "",
+                isTrial = isTrial, trialEndsAt = trialEndsAt
+            )
+        )
+        return "redirect:/subscriptions"
+    }
+
+    /**
      * Muestra la pantalla de confirmación antes de eliminar una suscripción.
      * GET /subscriptions/{id}/delete
      */
