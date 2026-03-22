@@ -1,6 +1,6 @@
 # Suscript Wallet — Gestor de suscripciones
 
-![Version](https://img.shields.io/badge/versión-2.10.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/versión-2.10.1-6366f1?style=flat-square)
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3ddc84?style=flat-square&logo=android)
 ![Stack](https://img.shields.io/badge/Spring%20Boot-3.3.5-6db33f?style=flat-square&logo=springboot)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-7f52ff?style=flat-square&logo=kotlin)
@@ -312,3 +312,4 @@ Consulta [CHANGELOG.md](CHANGELOG.md) para el historial completo de cambios.
 | 2.8.0   | 2026-03-22 | Catálogo browser — 170+ servicios, búsqueda y filtros, añadir con un clic desde /catalog-browser |
 | 2.9.0   | 2026-03-22 | Catálogo ampliado a 285+ servicios — 4 nuevas categorías: Finanzas, Educación, Creatividad y Citas |
 | 2.10.0  | 2026-03-22 | Fix crítico mapeo de categorías (citas/noticias no aparecían), +50 apps Play Store populares (320+ total) |
+| 2.10.1  | 2026-03-22 | Fix logos: dominios corregidos (LiveOne, Pokémon GO, Clash Royale, Brawl Stars), Stadia eliminado → Minecraft Realms |
