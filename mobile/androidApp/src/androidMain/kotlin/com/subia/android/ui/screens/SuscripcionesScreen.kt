@@ -69,6 +69,11 @@ import com.subia.shared.model.Category
 import com.subia.shared.model.Subscription
 import com.subia.shared.viewmodel.SuscripcionesUiState
 import com.subia.shared.viewmodel.SuscripcionesViewModel
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -287,6 +292,14 @@ private fun ListaSuscripciones(
 
 @Composable
 private fun SuscripcionCard(sub: Subscription, onNavigateToDetalle: (Long) -> Unit, modifier: Modifier = Modifier) {
+    // Calcula días restantes de prueba si procede
+    val diasPrueba: Int? = if (sub.esPrueba && !sub.fechaFinPrueba.isNullOrBlank()) {
+        runCatching {
+            val hoy = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+            hoy.daysUntil(LocalDate.parse(sub.fechaFinPrueba))
+        }.getOrNull()
+    } else null
+
     // Borde izquierdo acento + contenedor de tarjeta
     Row(
         modifier = modifier
@@ -305,31 +318,56 @@ private fun SuscripcionCard(sub: Subscription, onNavigateToDetalle: (Long) -> Un
                     shape = RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp)
                 )
         )
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 14.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            ServiceLogo(nombre = sub.nombre, size = 44.dp)
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(sub.nombre, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    periodoCiclo(sub.periodoFacturacion),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    "Renueva: ${sub.fechaRenovacion}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ServiceLogo(nombre = sub.nombre, size = 44.dp)
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(sub.nombre, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        periodoCiclo(sub.periodoFacturacion),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "Renueva: ${sub.fechaRenovacion}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("%.2f €".format(sub.precio), fontWeight = FontWeight.Bold, color = Indigo400)
+                    Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                }
             }
-            Column(horizontalAlignment = Alignment.End) {
-                Text("%.2f €".format(sub.precio), fontWeight = FontWeight.Bold, color = Indigo400)
-                Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+
+            // Badge de prueba gratuita
+            if (diasPrueba != null) {
+                val badgeColor = if (diasPrueba <= 3) MaterialTheme.colorScheme.error else Color(0xFFF97316)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 8.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(badgeColor)
+                        .padding(horizontal = 7.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "Prueba · ${diasPrueba}d",
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }

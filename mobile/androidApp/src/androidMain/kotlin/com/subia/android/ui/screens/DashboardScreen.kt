@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.EuroSymbol
 import androidx.compose.material.icons.filled.Subscriptions
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,6 +76,7 @@ fun DashboardScreen(
     val totalesPorMoneda by viewModel.totalesPorMoneda.collectAsState()
     val totalesAnualesPorMoneda by viewModel.totalesAnualesPorMoneda.collectAsState()
     val gastosPorCategoria by viewModel.gastosPorCategoria.collectAsState()
+    val pruebasPorVencer by viewModel.pruebasPorVencer.collectAsState()
     val isRefreshing = uiState is DashboardUiState.Loading
 
     PullToRefreshBox(
@@ -86,10 +88,10 @@ fun DashboardScreen(
             is DashboardUiState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                 CircularProgressIndicator()
             }
-            is DashboardUiState.Success -> DashboardContent(state.resumen, totalesPorMoneda, totalesAnualesPorMoneda, gastosPorCategoria, onNavigateToSuscripciones)
+            is DashboardUiState.Success -> DashboardContent(state.resumen, totalesPorMoneda, totalesAnualesPorMoneda, gastosPorCategoria, pruebasPorVencer, onNavigateToSuscripciones)
             is DashboardUiState.Offline -> Column {
                 BannerOffline("Mostrando datos guardados — sin conexión")
-                state.resumenCacheado?.let { DashboardContent(it, totalesPorMoneda, totalesAnualesPorMoneda, gastosPorCategoria, onNavigateToSuscripciones) }
+                state.resumenCacheado?.let { DashboardContent(it, totalesPorMoneda, totalesAnualesPorMoneda, gastosPorCategoria, pruebasPorVencer, onNavigateToSuscripciones) }
             }
             is DashboardUiState.Error -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -142,6 +144,7 @@ private fun DashboardContent(
     totalesPorMoneda: Map<String, Double> = emptyMap(),
     totalesAnualesPorMoneda: Map<String, Double> = emptyMap(),
     gastosPorCategoria: Map<String, Double> = emptyMap(),
+    pruebasPorVencer: List<com.subia.shared.model.ProximaRenovacion> = emptyList(),
     onNavigateToSuscripciones: () -> Unit = {}
 ) {
     val gradientsMensual = listOf(
@@ -271,6 +274,12 @@ private fun DashboardContent(
             }
         }
 
+        if (pruebasPorVencer.isNotEmpty()) {
+            item {
+                PruebasPorVencerCard(pruebasPorVencer)
+            }
+        }
+
         if (resumen.renovacionesProximas.isNotEmpty()) {
             item {
                 Text(
@@ -350,6 +359,50 @@ private fun RenovacionCard(renovacion: ProximaRenovacion) {
                     color = diasColor,
                     fontWeight = FontWeight.SemiBold
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PruebasPorVencerCard(pruebas: List<com.subia.shared.model.ProximaRenovacion>) {
+    val naranja = Color(0xFFF97316)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, naranja, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = naranja.copy(alpha = 0.10f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                "Pruebas por vencer",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = naranja
+            )
+            pruebas.forEach { prueba ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(prueba.nombre, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                        Text(
+                            "Vence el ${prueba.fechaRenovacion}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        "${prueba.diasRestantes}d",
+                        fontWeight = FontWeight.Bold,
+                        color = if (prueba.diasRestantes <= 3) MaterialTheme.colorScheme.error else naranja,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
     }

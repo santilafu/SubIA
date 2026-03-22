@@ -30,5 +30,7 @@ data class NuevaSuscripcionRequest(
     @SerialName("billingCycle") val periodoFacturacion: String,
     @SerialName("renewalDate") val fechaRenovacion: String,
     @SerialName("categoryId") val categoriaId: Long? = null,
-    @SerialName("notes") val notas: String = ""
+    @SerialName("notes") val notas: String = "",
+    @SerialName("isTrial")     val esPrueba: Boolean = false,
+    @SerialName("trialEndsAt") val fechaFinPrueba: String? = null
 )

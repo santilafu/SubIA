@@ -41,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -95,6 +96,8 @@ fun SuscripcionFormScreen(
     val fechaRenovacion by formViewModel.fechaRenovacion.collectAsState()
     val notas by formViewModel.notas.collectAsState()
     val categoriaId by formViewModel.categoriaId.collectAsState()
+    val esPrueba by formViewModel.esPrueba.collectAsState()
+    val fechaFinPrueba by formViewModel.fechaFinPrueba.collectAsState()
 
     val categorias by formViewModel.categorias.collectAsState()
     val serviciosPorCategoria by formViewModel.serviciosPorCategoria.collectAsState()
@@ -122,6 +125,8 @@ fun SuscripcionFormScreen(
 
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    var showDatePickerPrueba by remember { mutableStateOf(false) }
+    val datePickerStatePrueba = rememberDatePickerState()
 
     var expandedMoneda by remember { mutableStateOf(false) }
     var expandedPeriodo by remember { mutableStateOf(false) }
@@ -433,6 +438,66 @@ fun SuscripcionFormScreen(
                     }
                 ) {
                     DatePicker(state = datePickerState)
+                }
+            }
+
+            // ── Período de prueba gratuita ─────────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Período de prueba gratuita",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Switch(
+                    checked = esPrueba,
+                    onCheckedChange = { formViewModel.esPrueba.value = it },
+                    enabled = !isLoading
+                )
+            }
+
+            if (esPrueba) {
+                OutlinedTextField(
+                    value = if (!fechaFinPrueba.isNullOrBlank()) {
+                        runCatching {
+                            val parts = fechaFinPrueba.split("-")
+                            "${parts[2]}/${parts[1]}/${parts[0]}"
+                        }.getOrDefault(fechaFinPrueba)
+                    } else "",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Fin de prueba") },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePickerPrueba = true }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha fin de prueba")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().clickable { showDatePickerPrueba = true },
+                    enabled = !isLoading,
+                    singleLine = true
+                )
+            }
+
+            if (showDatePickerPrueba) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePickerPrueba = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerStatePrueba.selectedDateMillis?.let { millis ->
+                                val localDate = Instant.fromEpochMilliseconds(millis)
+                                    .toLocalDateTime(TimeZone.UTC).date
+                                formViewModel.seleccionarFechaFinPrueba(localDate.toString())
+                            }
+                            showDatePickerPrueba = false
+                        }) { Text("Aceptar") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePickerPrueba = false }) { Text("Cancelar") }
+                    }
+                ) {
+                    DatePicker(state = datePickerStatePrueba)
                 }
             }
 

@@ -14,6 +14,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 
 sealed interface FormUiState {
     data object Idle : FormUiState
@@ -45,6 +50,8 @@ class SuscripcionFormViewModel(
     /** Id de la categoría asignada a la suscripción (campo real del formulario). */
     val categoriaId = MutableStateFlow<Long?>(null)
     val notas = MutableStateFlow("")
+    val esPrueba = MutableStateFlow(false)
+    val fechaFinPrueba = MutableStateFlow<String?>(null)
 
     // ── Selector de catálogo en línea ──────────────────────────────────────
 
@@ -135,6 +142,8 @@ class SuscripcionFormViewModel(
         fechaRenovacion.value = suscripcion.fechaRenovacion
         categoriaId.value = suscripcion.categoriaId
         notas.value = suscripcion.notas
+        esPrueba.value = suscripcion.esPrueba
+        fechaFinPrueba.value = suscripcion.fechaFinPrueba
     }
 
     /** Precarga nombre, precio y categoría desde un ítem del catálogo. */
@@ -145,6 +154,17 @@ class SuscripcionFormViewModel(
             periodoFacturacion.value = item.periodoFacturacion.ifBlank { "MONTHLY" }
         }
         moneda.value = item.moneda
+        val diasPrueba = item.diasPrueba
+        if (diasPrueba != null) {
+            esPrueba.value = true
+            val hoy = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+            fechaFinPrueba.value = (hoy + DatePeriod(days = diasPrueba)).toString()
+        }
+    }
+
+    /** Establece la fecha de fin de prueba desde el selector de fecha. */
+    fun seleccionarFechaFinPrueba(fecha: String) {
+        fechaFinPrueba.value = fecha
     }
 
     /** Establece la categoría de la suscripción desde el desplegable standalone del formulario. */
@@ -183,7 +203,9 @@ class SuscripcionFormViewModel(
             periodoFacturacion = periodoFacturacion.value,
             fechaRenovacion = fechaRenovacion.value,
             categoriaId = categoriaId.value,
-            notas = notas.value.trim()
+            notas = notas.value.trim(),
+            esPrueba = esPrueba.value,
+            fechaFinPrueba = if (esPrueba.value) fechaFinPrueba.value else null
         )
 
         viewModelScope.launch {

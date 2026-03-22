@@ -13,6 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -65,6 +70,13 @@ class DashboardViewModel(
      */
     val totalesAnualesPorMoneda: StateFlow<Map<String, Double>> = _totalesAnualesPorMoneda.asStateFlow()
 
+    private val _pruebasPorVencer = MutableStateFlow<List<ProximaRenovacion>>(emptyList())
+    /**
+     * Lista de suscripciones en prueba gratuita que vencen en los próximos 7 días.
+     * Se calcula en el cliente a partir de la lista de suscripciones activas.
+     */
+    val pruebasPorVencer: StateFlow<List<ProximaRenovacion>> = _pruebasPorVencer.asStateFlow()
+
     init { cargarEstadisticas() }
 
     /** Carga las estadísticas del dashboard y los totales por divisa en paralelo. */
@@ -86,6 +98,7 @@ class DashboardViewModel(
                     _totalesPorMoneda.value = calcularTotalesPorMoneda(cachedSubs)
                     _totalesAnualesPorMoneda.value = calcularTotalesAnualesPorMoneda(cachedSubs)
                     _gastosPorCategoria.value = calcularGastosPorCategoria(cachedSubs)
+                    _pruebasPorVencer.value = calcularPruebasPorVencer(cachedSubs)
                 }
             }
 
@@ -125,6 +138,7 @@ class DashboardViewModel(
                 _totalesPorMoneda.value = calcularTotalesPorMoneda(subs)
                 _totalesAnualesPorMoneda.value = calcularTotalesAnualesPorMoneda(subs)
                 _gastosPorCategoria.value = calcularGastosPorCategoria(subs)
+                _pruebasPorVencer.value = calcularPruebasPorVencer(subs)
                 cacheRepository.saveString(CACHE_KEY_SUBS, json.encodeToString(subs))
                 cacheRepository.saveTimestamp(CACHE_KEY_SUBS)
             }
@@ -176,6 +190,28 @@ class DashboardViewModel(
                 }
             })
             .associate { it.key to it.value }
+    }
+
+    /**
+     * Filtra las suscripciones en período de prueba gratuita que vencen en los próximos 7 días
+     * y las devuelve como [ProximaRenovacion] para reutilizar el mismo modelo de UI.
+     */
+    internal fun calcularPruebasPorVencer(subs: List<Subscription>): List<ProximaRenovacion> {
+        val hoy = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return subs
+            .filter { it.esPrueba && !it.fechaFinPrueba.isNullOrBlank() }
+            .mapNotNull { sub ->
+                val fecha = runCatching { LocalDate.parse(sub.fechaFinPrueba!!) }.getOrNull() ?: return@mapNotNull null
+                val dias = hoy.daysUntil(fecha)
+                if (dias in 0..7) ProximaRenovacion(
+                    id = sub.id,
+                    nombre = sub.nombre,
+                    precio = sub.precio,
+                    fechaRenovacion = sub.fechaFinPrueba!!,
+                    diasRestantes = dias
+                ) else null
+            }
+            .sortedBy { it.diasRestantes }
     }
 
     /**
